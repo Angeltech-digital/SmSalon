@@ -1,0 +1,138 @@
+🔧 SOLUTION: Python SSL Certificate Error
+
+═══════════════════════════════════════════════════════════════════
+
+PROBLEM:
+--------
+Python 3.8 on your system is missing OpenSSL/SSL support.
+pip cannot download packages from PyPI because SSL is unavailable.
+
+═══════════════════════════════════════════════════════════════════
+
+SOLUTION OPTIONS (try in order):
+
+Option 1: Install OpenSSL Development Files (RECOMMENDED)
+──────────────────────────────────────────────────────
+
+Ubuntu/Debian:
+  sudo apt-get update
+  sudo apt-get install -y libssl-dev python3-dev
+
+CentOS/RHEL:
+  sudo yum install -y openssl-devel python3-devel
+
+Fedora:
+  sudo dnf install -y openssl-devel python3-devel
+
+Then recreate the virtual environment:
+  rm -rf /home/angela/Salon/Backend/venv
+  cd /home/angela/Salon/Backend
+  python3 -m venv venv
+  source venv/bin/activate
+  pip install -r requirements.txt
+
+═══════════════════════════════════════════════════════════════════
+
+Option 2: Use Python 3.9+ (if available)
+──────────────────────────────────────
+
+  which python3.9
+  which python3.10
+  which python3.11
+
+If available, use it:
+  python3.9 -m venv venv
+  source venv/bin/activate
+  pip install -r requirements.txt
+
+═══════════════════════════════════════════════════════════════════
+
+Option 3: Install Python 3.10+ with SSL Support
+────────────────────────────────────────────
+
+Ubuntu/Debian:
+  sudo apt-get install -y python3.10 python3.10-venv python3.10-dev
+
+CentOS/RHEL:
+  sudo yum install -y python310 python310-devel
+
+Then use it:
+  python3.10 -m venv venv
+  source venv/bin/activate
+  pip install -r requirements.txt
+
+═══════════════════════════════════════════════════════════════════
+
+Option 4: Use Frontend Only (No Backend for Now)
+─────────────────────────────────────────────
+
+You can use the website WITHOUT the backend API:
+
+  cd /home/angela/Salon/Frontend
+  python -m http.server 8001
+
+  Open: http://localhost:8001
+
+The website will work perfectly for viewing pages.
+Booking form won't submit (needs backend), but everything else works!
+
+═══════════════════════════════════════════════════════════════════
+
+Option 5: Install via apt/yum Packages
+──────────────────────────────────────
+
+Instead of pip, install system packages:
+
+Ubuntu/Debian:
+  sudo apt-get install -y python3-django python3-djangorestframework
+
+CentOS/RHEL:
+  sudo yum install -y python3-django
+
+═══════════════════════════════════════════════════════════════════
+
+WHY THIS HAPPENED:
+──────────────────
+
+Python 3.8 was compiled without OpenSSL support.
+This is common in:
+  - Minimal Linux installations
+  - WSL (Windows Subsystem for Linux)
+  - Docker containers without SSL libraries
+  - Some older distributions
+
+═══════════════════════════════════════════════════════════════════
+
+QUICK TEST:
+───────────
+
+Check if SSL is available:
+  python3 -c "import ssl; print('SSL available')"
+
+If you see "SSL available" → problem is fixed
+If you see an error → SSL not available → follow solutions above
+
+═══════════════════════════════════════════════════════════════════
+
+AFTER FIXING SSL:
+─────────────────
+
+Then run:
+
+  cd /home/angela/Salon/Backend
+  source venv/bin/activate
+  pip install -r requirements.txt
+  python manage.py migrate
+  python manage.py createsuperuser
+  python manage.py runserver
+
+═══════════════════════════════════════════════════════════════════
+
+RECOMMENDED NEXT STEP:
+─────────────────────
+
+1. Try Option 1 (install openssl-dev)
+2. If that doesn't work, try Option 3 (use Python 3.10+)
+3. In the meantime, use Option 4 (Frontend only)
+
+═══════════════════════════════════════════════════════════════════

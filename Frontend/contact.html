@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact Us - SM BARBERSHOP SALON AND SPA</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="container">
+            <div class="logo">💇 SM BARBERSHOP SALON AND SPA</div>
+            <ul class="nav-links">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="services.html">Services</a></li>
+                <li><a href="about.html">About</a></li>
+                <li><a href="contact.html" class="active">Contact</a></li>
+                <li><a href="login.html" class="admin-link">Admin</a></li>
+            </ul>
+            <div class="hamburger">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Page Header -->
+    <section class="page-header">
+        <h1>Get In Touch</h1>
+        <p>We'd love to hear from you</p>
+    </section>
+
+    <!-- Contact Section -->
+    <section class="contact-section">
+        <div class="container">
+            <div class="contact-wrapper">
+                <!-- Contact Form -->
+                <div class="contact-form-col">
+                    <h2>Send us a Message</h2>
+                    <form id="contactForm" class="contact-form">
+                        <div class="form-group">
+                            <label for="name">Your Name</label>
+                            <input 
+                                type="text" 
+                                id="name" 
+                                name="name" 
+                                placeholder="John Doe" 
+                                required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="contact-email">Email Address</label>
+                            <input 
+                                type="email" 
+                                id="contact-email" 
+                                name="email" 
+                                placeholder="you@example.com" 
+                                required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="subject">Subject</label>
+                            <input 
+                                type="text" 
+                                id="subject" 
+                                name="subject" 
+                                placeholder="How can we help?" 
+                                required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="message">Message</label>
+                            <textarea 
+                                id="message" 
+                                name="message" 
+                                placeholder="Your message here..." 
+                                rows="5" 
+                                required></textarea>
+                        </div>
+
+                        <button type="submit" class="submit-button">Send Message</button>
+                    </form>
+                </div>
+
+                <!-- Contact Info -->
+                <div class="contact-info-col">
+                    <h2>Contact Information</h2>
+
+                    <!-- Phone -->
+                    <div class="contact-item">
+                        <h4>📞 Phone</h4>
+                        <p><a href="tel:+254712345678">+254 712 345 678</a></p>
+                        <p class="info-text">Mon - Sat: 9:00 AM - 8:00 PM</p>
+                        <p class="info-text">Sunday: 10:00 AM - 6:00 PM</p>
+                    </div>
+
+                    <!-- WhatsApp -->
+                    <div class="contact-item">
+                        <h4>💬 WhatsApp</h4>
+                        <p>
+                            <a href="https://wa.me/254712345678" target="_blank" class="whatsapp-link">
+                                Chat with us on WhatsApp
+                            </a>
+                        </p>
+                        <p class="info-text">Quick replies & appointment booking</p>
+                    </div>
+
+                    <!-- Email -->
+                    <div class="contact-item">
+                        <h4>✉️ Email</h4>
+                        <p><a href="mailto:info@salon.com">info@salon.com</a></p>
+                        <p class="info-text">We respond within 2 hours</p>
+                    </div>
+
+                    <!-- Location -->
+                    <div class="contact-item">
+                        <h4>📍 Location</h4>
+                        <p>123 Beauty Lane</p>
+                        <p>Nairobi, Kenya 00100</p>
+                        <p class="info-text">
+                            <a href="https://maps.google.com/?q=salon" target="_blank">
+                                View on Google Maps
+                            </a>
+                        </p>
+                    </div>
+
+                    <!-- Social Media -->
+                    <div class="contact-item">
+                        <h4>Follow Us</h4>
+                        <div class="social-links-large">
+                            <a href="#" class="social-link">📘 Facebook</a>
+                            <a href="#" class="social-link">📷 Instagram</a>
+                            <a href="#" class="social-link">🐦 Twitter</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Google Map Embed -->
+            <div class="map-section">
+                <h2>Find Us</h2>
+                <iframe 
+                    src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3988.8117606878467!2d36.78!3d-1.29!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3a3d3d3d3d3d3d3d%3A0x0!2sSalon%20-%20Beauty%20Services!5e0!3m2!1sen!2ske!4v" 
+                    width="100%" 
+                    height="400" 
+                    style="border:0;" 
+                    allowfullscreen="" 
+                    loading="lazy" 
+                    referrerpolicy="no-referrer-when-downgrade">
+                </iframe>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2026 SM BARBERSHOP SALON AND SPA. All rights reserved.</p>
+            <div class="social-links">
+                <a href="#" class="social-icon">📘</a>
+                <a href="#" class="social-icon">📷</a>
+                <a href="#" class="social-icon">🐦</a>
+            </div>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>

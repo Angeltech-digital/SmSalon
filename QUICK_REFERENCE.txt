@@ -1,0 +1,152 @@
+# ⚡ One-Page Quick Reference
+
+## 🎯 Start Here (Copy & Paste)
+
+### Terminal 1: Backend
+```bash
+cd /home/angela/Salon/Backend && source venv/bin/activate && python manage.py runserver
+```
+→ http://localhost:8000
+
+### Terminal 2: Frontend
+```bash
+cd /home/angela/Salon/Frontend && python -m http.server 8001
+```
+→ http://localhost:8001
+
+---
+
+## 📍 Key URLs
+
+| What | URL | Login |
+|------|-----|-------|
+| Website | http://localhost:8001 | - |
+| API | http://localhost:8000/api/ | - |
+| Admin Panel | http://localhost:8000/admin/ | admin / admin123 |
+| Services API | http://localhost:8000/api/services/ | - |
+| Bookings API | http://localhost:8000/api/bookings/ | - |
+
+---
+
+## 🎨 Frontend Pages
+
+| Page | Path | Purpose |
+|------|------|---------|
+| Home | / | Welcome, service preview |
+| Services | /services.html | Complete service catalog |
+| Booking | /booking.html | Make appointments |
+| About | /about.html | Salon story & team |
+| Contact | /contact.html | Contact form & map |
+
+---
+
+## 🔑 Admin Features
+
+- **Services**: Add/edit/delete services with pricing
+- **Stylists**: Manage team members & specializations
+- **Bookings**: View/confirm/cancel appointments
+- **Messages**: Respond to contact form submissions
+- **Reviews**: Approve client testimonials
+- **Settings**: Configure salon information
+
+---
+
+## 📦 Project Location
+
+```
+/home/angela/Salon/
+├── Frontend/          (Website files)
+├── Backend/           (Django API)
+│   └── venv/         (Python 3.10 environment)
+└── Documentation
+```
+
+---
+
+## 🚀 Common Commands
+
+```bash
+# Restart backend
+cd /home/angela/Salon/Backend
+source venv/bin/activate
+python manage.py runserver
+
+# Create new superuser
+python manage.py createsuperuser
+
+# Reset database
+rm db.sqlite3
+python manage.py migrate
+
+# View database
+python manage.py shell
+>>> from salon_app.models import Service
+>>> Service.objects.all()
+
+# Stop servers
+Press Ctrl+C
+```
+
+---
+
+## 🎁 What's Ready
+
+✅ 5 responsive HTML pages  
+✅ Complete booking system  
+✅ Django REST API  
+✅ SQLite database  
+✅ Admin panel  
+✅ 5 sample services  
+✅ Email ready (needs config)  
+✅ Mobile optimized  
+✅ Form validation  
+✅ Documentation  
+
+---
+
+## 🐛 Troubleshooting
+
+**Port in use?**
+```bash
+lsof -i :8000 | grep LISTEN | awk '{print $2}' | xargs kill -9
+```
+
+**Forms not submitting?**
+- Check backend is running
+- Check browser console (F12 → Console)
+
+**Admin login fails?**
+```bash
+cd Backend && source venv/bin/activate
+python manage.py changepassword admin
+```
+
+**Database issues?**
+```bash
+cd Backend && rm db.sqlite3
+source venv/bin/activate
+python manage.py migrate
+```
+
+---
+
+## 📞 Admin Login
+
+```
+Username: admin
+Password: admin123
+URL: http://localhost:8000/admin/
+```
+
+---
+
+## 📚 Full Docs
+
+- `QUICK_START.md` - Detailed guide
+- `Backend/README.md` - Backend setup
+- `Backend/DEPLOYMENT.md` - Production deploy
+- `Backend/TROUBLESHOOTING.md` - Common fixes
+
+---
+
+**You're all set! Open http://localhost:8001 🎉**

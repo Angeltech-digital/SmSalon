@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Book Appointment - SM BARBERSHOP SALON AND SPA</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="container">
+            <div class="logo">💇 SM BARBERSHOP SALON AND SPA</div>
+            <ul class="nav-links">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="services.html">Services</a></li>
+                <li><a href="about.html">About</a></li>
+                <li><a href="contact.html">Contact</a></li>
+            </ul>
+            <div class="hamburger">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Page Header -->
+    <section class="page-header">
+        <h1>Book Your Appointment</h1>
+        <p>Quick & easy booking in 2 minutes</p>
+    </section>
+
+    <!-- Booking Form -->
+    <section class="booking-section">
+        <div class="container">
+            <div class="booking-form-wrapper">
+                <form id="bookingForm" class="booking-form">
+                    <h2>Appointment Details</h2>
+
+                    <!-- Personal Information -->
+                    <fieldset>
+                        <legend>Your Information</legend>
+                        
+                        <div class="form-group">
+                            <label for="fullname">Full Name *</label>
+                            <input 
+                                type="text" 
+                                id="fullname" 
+                                name="fullname" 
+                                placeholder="John Doe" 
+                                required>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="phone">Phone Number *</label>
+                                <input 
+                                    type="tel" 
+                                    id="phone" 
+                                    name="phone" 
+                                    placeholder="+254 712 345 678" 
+                                    required>
+                            </div>
+                            <div class="form-group">
+                                <label for="email">Email</label>
+                                <input 
+                                    type="email" 
+                                    id="email" 
+                                    name="email" 
+                                    placeholder="you@example.com">
+                            </div>
+                        </div>
+                    </fieldset>
+
+                    <!-- Service Selection -->
+                    <fieldset>
+                        <legend>Service Details</legend>
+
+                        <div class="form-group">
+                            <label for="service">Service Type *</label>
+                            <select id="service" name="service" required>
+                                <option value="">-- Select a service --</option>
+                                <optgroup label="Hair Services">
+                                    <option value="hair-cut">Hair Cut (KES 500)</option>
+                                    <option value="hair-color">Hair Coloring (KES 1,500)</option>
+                                    <option value="hair-treatment">Hair Treatment (KES 800)</option>
+                                    <option value="blowout">Blowout & Styling (KES 600)</option>
+                                </optgroup>
+                                <optgroup label="Nail Services">
+                                    <option value="manicure">Manicure (KES 700)</option>
+                                    <option value="pedicure">Pedicure (KES 900)</option>
+                                    <option value="nail-extensions">Nail Extensions (KES 1,200)</option>
+                                </optgroup>
+                                <optgroup label="Makeup Services">
+                                    <option value="bridal-makeup">Bridal Makeup (KES 2,000)</option>
+                                    <option value="party-makeup">Party Makeup (KES 1,500)</option>
+                                    <option value="everyday-makeup">Everyday Makeup (KES 800)</option>
+                                </optgroup>
+                                <optgroup label="Braiding & Weaves">
+                                    <option value="braiding">Braiding (KES 1,000)</option>
+                                    <option value="weave">Weave Installation (KES 2,500)</option>
+                                    <option value="wig">Wig Installation (KES 800)</option>
+                                </optgroup>
+                            </select>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="date">Preferred Date *</label>
+                                <input 
+                                    type="date" 
+                                    id="date" 
+                                    name="date" 
+                                    required>
+                            </div>
+                            <div class="form-group">
+                                <label for="time">Preferred Time *</label>
+                                <input 
+                                    type="time" 
+                                    id="time" 
+                                    name="time" 
+                                    required>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="stylist">Preferred Stylist</label>
+                            <select id="stylist" name="stylist">
+                                <option value="">-- Any available --</option>
+                                <option value="sarah">Sarah (Hair & Makeup)</option>
+                                <option value="michael">Michael (Barbering & Hair)</option>
+                                <option value="jane">Jane (Nails)</option>
+                                <option value="amina">Amina (Braiding & Weaves)</option>
+                            </select>
+                        </div>
+                    </fieldset>
+
+                    <!-- Additional Notes -->
+                    <fieldset>
+                        <legend>Additional Information</legend>
+
+                        <div class="form-group">
+                            <label for="notes">Additional Notes</label>
+                            <textarea 
+                                id="notes" 
+                                name="notes" 
+                                placeholder="Tell us about any specific requests or preferences..."
+                                rows="4"></textarea>
+                        </div>
+
+                        <div class="form-group checkbox">
+                            <input 
+                                type="checkbox" 
+                                id="sendEmail" 
+                                name="sendEmail" 
+                                checked>
+                            <label for="sendEmail">Send me a confirmation email</label>
+                        </div>
+                    </fieldset>
+
+                    <!-- Submit -->
+                    <button type="submit" class="submit-button">Complete Booking</button>
+                    <p class="form-note">We'll confirm your appointment within 2 hours</p>
+                </form>
+
+                <!-- Success Message -->
+                <div id="successMessage" class="success-message" style="display: none;">
+                    <h3>✅ Booking Confirmed!</h3>
+                    <p>Thank you for booking with us.</p>
+                    <p>We've sent a confirmation to your phone & email.</p>
+                    <p>We'll see you soon!</p>
+                    <a href="index.html" class="cta-button">Back to Home</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2026 SM BARBERSHOP SALON AND SPA. All rights reserved.</p>
+            <div class="social-links">
+                <a href="#" class="social-icon">📘</a>
+                <a href="#" class="social-icon">📷</a>
+                <a href="#" class="social-icon">🐦</a>
+            </div>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>
