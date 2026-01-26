@@ -44,23 +44,42 @@ document.addEventListener('DOMContentLoaded', function() {
     // Check backend connectivity
     checkBackendConnection();
 
+    // ==================== LOAD SERVICES ====================
+    loadServices();
+
     // ==================== BOOKING FORM SUBMISSION ====================
     const bookingForm = document.getElementById('bookingForm');
     if (bookingForm) {
         bookingForm.addEventListener('submit', function(e) {
             e.preventDefault();
 
-            // Get form data
+            // Get form data with null safety checks
+            const fullnameEl = document.getElementById('fullname');
+            const phoneEl = document.getElementById('phone');
+            const emailEl = document.getElementById('email');
+            const serviceEl = document.getElementById('service');
+            const dateEl = document.getElementById('date');
+            const timeEl = document.getElementById('time');
+            const stylistEl = document.getElementById('stylist');
+            const notesEl = document.getElementById('notes');
+            const sendEmailEl = document.getElementById('sendEmail');
+
+            // Validate all elements exist before accessing
+            if (!fullnameEl || !phoneEl || !serviceEl || !dateEl || !timeEl) {
+                console.error('Form elements not found');
+                return;
+            }
+
             const formData = {
-                fullname: document.getElementById('fullname').value,
-                phone: document.getElementById('phone').value,
-                email: document.getElementById('email').value || 'not-provided',
-                service: document.getElementById('service').value,
-                date: document.getElementById('date').value,
-                time: document.getElementById('time').value,
-                stylist: document.getElementById('stylist').value || 'Any',
-                notes: document.getElementById('notes').value,
-                sendEmail: document.getElementById('sendEmail').checked
+                fullname: fullnameEl.value,
+                phone: phoneEl.value,
+                email: emailEl ? emailEl.value || '' : '',
+                service: serviceEl.value,
+                date: dateEl.value,
+                time: timeEl.value,
+                stylist: stylistEl ? stylistEl.value || null : null,
+                notes: notesEl ? notesEl.value : '',
+                send_email: sendEmailEl ? sendEmailEl.checked : true
             };
 
             // Validate form
@@ -95,11 +114,22 @@ document.addEventListener('DOMContentLoaded', function() {
         contactForm.addEventListener('submit', function(e) {
             e.preventDefault();
 
+            const nameEl = document.getElementById('name');
+            const emailEl = document.getElementById('contact-email');
+            const subjectEl = document.getElementById('subject');
+            const messageEl = document.getElementById('message');
+
+            // Validate elements exist
+            if (!nameEl || !emailEl || !subjectEl || !messageEl) {
+                console.error('Contact form elements not found');
+                return;
+            }
+
             const formData = {
-                name: document.getElementById('name').value,
-                email: document.getElementById('contact-email').value,
-                subject: document.getElementById('subject').value,
-                message: document.getElementById('message').value
+                name: nameEl.value,
+                email: emailEl.value,
+                subject: subjectEl.value,
+                message: messageEl.value
             };
 
             // Send contact message
@@ -119,9 +149,11 @@ document.addEventListener('DOMContentLoaded', function() {
 function submitBooking(data) {
     // Show loading state
     const submitBtn = document.querySelector('.submit-button');
-    const originalText = submitBtn.textContent;
-    submitBtn.textContent = 'Processing...';
-    submitBtn.disabled = true;
+    if (submitBtn) {
+        const originalText = submitBtn.textContent;
+        submitBtn.textContent = 'Processing...';
+        submitBtn.disabled = true;
+    }
 
     // Send to backend
     fetch(API_ENDPOINTS.bookings, {
@@ -142,11 +174,18 @@ function submitBooking(data) {
         console.log('Booking successful:', result);
         
         // Hide form and show success message
-        document.getElementById('bookingForm').style.display = 'none';
-        document.getElementById('successMessage').style.display = 'block';
-
-        // Scroll to success message
-        document.getElementById('successMessage').scrollIntoView({ behavior: 'smooth' });
+        const bookingForm = document.getElementById('bookingForm');
+        const successMessage = document.getElementById('successMessage');
+        
+        if (bookingForm) {
+            bookingForm.style.display = 'none';
+        }
+        
+        if (successMessage) {
+            successMessage.style.display = 'block';
+            // Scroll to success message
+            successMessage.scrollIntoView({ behavior: 'smooth' });
+        }
 
         // Send WhatsApp notification
         sendWhatsAppNotification(data);
@@ -154,14 +193,20 @@ function submitBooking(data) {
     .catch(error => {
         console.error('Error:', error);
         alert('Booking failed. Please try again or contact us directly.');
-        submitBtn.textContent = originalText;
-        submitBtn.disabled = false;
+        
+        const submitBtn = document.querySelector('.submit-button');
+        if (submitBtn) {
+            submitBtn.textContent = 'Book Now';
+            submitBtn.disabled = false;
+        }
     });
 }
 
 // ==================== SUBMIT CONTACT ====================
 function submitContact(data) {
     const submitBtn = document.querySelector('.submit-button');
+    if (!submitBtn) return;
+    
     const originalText = submitBtn.textContent;
     submitBtn.textContent = 'Sending...';
     submitBtn.disabled = true;
@@ -183,7 +228,10 @@ function submitContact(data) {
     .then(result => {
         console.log('Message sent:', result);
         alert('Thank you! We received your message. We\'ll be in touch soon.');
-        document.getElementById('contactForm').reset();
+        const contactForm = document.getElementById('contactForm');
+        if (contactForm) {
+            contactForm.reset();
+        }
         submitBtn.textContent = originalText;
         submitBtn.disabled = false;
     })
@@ -244,6 +292,71 @@ function checkBackendConnection() {
     .catch(error => {
         console.warn('⚠️ Backend not available. Running in offline mode.');
         console.warn('API Base URL:', API_CONFIG.BASE_URL);
+    });
+}
+// ==================== LOAD SERVICES ====================
+function loadServices() {
+    const serviceSelect = document.getElementById('service');
+    if (!serviceSelect) return;
+
+    // Fetch all services by requesting with a high limit
+    fetch(API_ENDPOINTS.services + '?limit=100', {
+        method: 'GET',
+        headers: { 'Content-Type': 'application/json' }
+    })
+    .then(response => response.json())
+    .then(data => {
+        // Handle paginated response
+        let allServices = data.results || (Array.isArray(data) ? data : []);
+        
+        // If there are more pages, fetch them recursively
+        if (data.next) {
+            const fetchNextPage = (nextUrl) => {
+                return fetch(nextUrl)
+                    .then(r => r.json())
+                    .then(pageData => {
+                        allServices = allServices.concat(pageData.results || []);
+                        if (pageData.next) {
+                            return fetchNextPage(pageData.next);
+                        }
+                        return allServices;
+                    });
+            };
+            return fetchNextPage(data.next);
+        }
+        return allServices;
+    })
+    .then(services => {
+        // Group services by category
+        const grouped = {};
+        services.forEach(service => {
+            if (!grouped[service.category]) {
+                grouped[service.category] = [];
+            }
+            grouped[service.category].push(service);
+        });
+
+        // Clear existing options except the first one
+        serviceSelect.innerHTML = '<option value="">-- Choose Service --</option>';
+
+        // Add grouped options
+        Object.keys(grouped).sort().forEach(category => {
+            const optgroup = document.createElement('optgroup');
+            optgroup.label = category.charAt(0).toUpperCase() + category.slice(1) + ' Services';
+            
+            grouped[category].forEach(service => {
+                const option = document.createElement('option');
+                option.value = service.id;
+                option.textContent = `${service.name} – KES ${service.price}`;
+                optgroup.appendChild(option);
+            });
+            
+            serviceSelect.appendChild(optgroup);
+        });
+    })
+    .catch(error => {
+        console.error('Error loading services:', error);
+        serviceSelect.innerHTML = '<option value="">Error loading services</option>';
     });
 }
 
@@ -344,44 +457,24 @@ function autoSaveForm() {
 
         // Save data on input
         inputs.forEach(input => {
-       Optional: Send to backend analytics endpoint
-    // Uncomment if you have an analytics endpoint
-    // fetch(`${API_CONFIG.BASE_URL}/analytics/`, {
-    //     method: 'POST',
-    //     headers: {
-    //         'Content-Type': 'application/json',
-    //         'X-CSRFToken': getCookie('csrftoken')
-    //     },
-    //     body: JSON.stringify({
-    //         event: eventName,
-    //         data: eventData,
-    //         timestamp: new Date().toISOString()
-    //     })
-    //ction trackEvent(eventName, eventData = {}) {
-    // Simple analytics tracking - you can integrate with Google Analytics
-    console.log(`Event: ${eventName}`, eventData);
-    
-    // Example: Send to backend
-    fetch('http://localhost:8000/api/analytics/', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'X-CSRFToken': getCookie('csrftoken')
-        },
-        body: JSON.stringify({
-            event: eventName,
-            data: eventData,
-            timestamp: new Date().toISOString()
-        })
-    }).catch(err => console.log('Analytics failed silently'));
+            input.addEventListener('input', function() {
+                const formData = new FormData(form);
+                const data = Object.fromEntries(formData);
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+            });
+        });
+    }
 }
 
-// Track page views
-trackEvent('page_view', { page: window.location.pathname });
+// Call autosave on page load
+if (document.getElementById('bookingForm')) {
+    autoSaveForm();
+}
 
-// Track CTA button clicks
-document.querySelectorAll('.cta-button').forEach(button => {
-    button.addEventListener('click', function() {
-        trackEvent('cta_clicked', { cta: this.textContent });
-    });
-});
+// ==================== ANALYTICS TRACKING ====================
+function trackEvent(eventName, eventData = {}) {
+    // Simple analytics tracking - you can integrate with Google Analytics
+    if (API_CONFIG.DEBUG) {
+        console.log(`Event: ${eventName}`, eventData);
+    }
+}

@@ -102,13 +102,16 @@ class BookingCreateSerializer(serializers.ModelSerializer):
 class BookingListSerializer(serializers.ModelSerializer):
     service = ServiceSerializer(read_only=True)
     stylist = StylistSerializer(read_only=True)
+    service_name = serializers.CharField(source='service.name', read_only=True)
+    stylist_name = serializers.CharField(source='stylist.name', read_only=True, allow_null=True)
     is_upcoming = serializers.SerializerMethodField()
     
     class Meta:
         model = Booking
         fields = [
             'id', 'fullname', 'phone', 'email', 'service', 'stylist',
-            'date', 'time', 'status', 'created_at', 'is_upcoming'
+            'service_name', 'stylist_name', 'date', 'time', 'status', 
+            'created_at', 'is_upcoming'
         ]
         read_only_fields = ['id', 'created_at', 'status']
     

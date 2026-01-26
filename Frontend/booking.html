@@ -134,18 +134,18 @@
 
       <div class="form-group">
         <label>Full Name *</label>
-        <input type="text" required>
+        <input type="text" id="fullname" required>
       </div>
 
       <div class="form-row">
         <div class="form-group">
           <label>Phone Number *</label>
-          <input type="tel" placeholder="0741464762" required>
+          <input type="tel" id="phone" placeholder="0741464762" required>
         </div>
 
         <div class="form-group">
           <label>Email (optional)</label>
-          <input type="email" placeholder="you@example.com">
+          <input type="email" id="email" placeholder="you@example.com">
         </div>
       </div>
     </fieldset>
@@ -155,82 +155,33 @@
 
       <div class="form-group">
         <label>Select Service *</label>
-        <select required>
-          <option value="">-- Choose Service --</option>
-
-          <optgroup label="Hair Services">
-            <option>Ladies Haircut – KES 500</option>
-            <option>Gents Haircut – KES 400</option>
-            <option>Kids Haircut – KES 200</option>
-            <option>Braiding – Price varies</option>
-            <option>Weaving – Price varies</option>
-            <option>Wig Gluing – Price varies</option>
-            <option>Dreadlocks Fresh – KES 2000–4000</option>
-            <option>Dreadlocks Retouch – KES 1000–2500</option>
-            <option>Hair Relaxer – KES 1000–2500</option>
-            <option>Hair & Scalp Treatment – KES 600–2000</option>
-            <option>Hair Coloring / Dye – KES 400–2500</option>
-          </optgroup>
-
-          <optgroup label="Nail Services">
-            <option>Manicure – KES 500</option>
-            <option>Pedicure – KES 1500</option>
-            <option>Normal Polish – KES 300</option>
-            <option>Gel Polish – KES 700</option>
-            <option>Acrylics – KES 2000–3500</option>
-            <option>Gum Gel – KES 1500–2000</option>
-            <option>Stick Ons – KES 1200</option>
-            <option>Dip Powder – KES 1500–2000</option>
-            <option>Builder Gel / Overlay – KES 1000–1500</option>
-            <option>Soak Off – KES 300–1000</option>
-          </optgroup>
-
-          <optgroup label="Makeup & Lashes">
-            <option>Makeup Only – KES 3000</option>
-            <option>Makeup with Eyelashes – KES 1500–5000</option>
-            <option>Synthetic Eyelashes – KES 500–1500</option>
-            <option>Human Hair Eyelashes – KES 2000–3000</option>
-          </optgroup>
-
-          <optgroup label="Wigs">
-            <option>Straight / Bob Wig – KES 6500–15500</option>
-            <option>Deep Wave / Jerry Curl – KES 7200–16800</option>
-            <option>Wig Washing & Styling – KES 800–2000</option>
-          </optgroup>
-
-          <optgroup label="Other Services">
-            <option>Facial – KES 1500</option>
-            <option>Full Body Massage – KES 2500</option>
-            <option>Ear Piercing – KES 700</option>
-            <option>Nose Piercing – KES 700</option>
-            <option>Eyebrow Shaping – KES 200–500</option>
-            <option>Eyebrow Shaping with Henna – KES 400–800</option>
-          </optgroup>
+        <select id="service" required>
+          <option value="">-- Loading Services --</option>
         </select>
       </div>
 
       <div class="form-row">
         <div class="form-group">
           <label>Date *</label>
-          <input type="date" required>
+          <input type="date" id="date" required>
         </div>
         <div class="form-group">
           <label>Time *</label>
-          <input type="time" required>
+          <input type="time" id="time" required>
         </div>
       </div>
     </fieldset>
 
     <fieldset>
       <legend>Additional Notes</legend>
-      <textarea placeholder="Any special requests?"></textarea>
+      <textarea id="notes" placeholder="Any special requests?"></textarea>
     </fieldset>
 
     <button type="submit">Complete Booking</button>
 
   </form>
 
-  <div class="success" id="successMsg">
+  <div class="success" id="successMessage">
     <h3>✅ Booking Received!</h3>
     <p>We’ll contact you shortly to confirm.</p>
     <p>Thank you for choosing SM Salon & Spa 💛</p>
@@ -242,13 +193,7 @@
   <p>Open 8:00am – 8:00pm | Call: 0741464762 / 0720483382</p>
 </footer>
 
-<script>
-  document.getElementById("bookingForm").addEventListener("submit", function(e){
-    e.preventDefault();
-    this.style.display = "none";
-    document.getElementById("successMsg").style.display = "block";
-  });
-</script>
+<script src="script.js"></script>
 
 </body>
 </html>

@@ -6,14 +6,14 @@
 }
 
 :root {
-    --primary-color: #d4a5a5;
-    --secondary-color: #8b6f6f;
-    --accent-color: #f4d4d4;
-    --dark-color: #3d3d3d;
-    --light-color: #f9f7f7;
-    --text-dark: #2c2c2c;
+    --primary-color: #c89b3c;
+    --secondary-color: #b18933;
+    --accent-color: #c89b3c;
+    --dark-color: #111;
+    --light-color: #f4f4f4;
+    --text-dark: #222;
     --text-light: #666;
-    --border-color: #e0d5d5;
+    --border-color: #ddd;
     --success-color: #4caf50;
     --error-color: #f44336;
 }
