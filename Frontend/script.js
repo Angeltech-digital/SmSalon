@@ -47,6 +47,15 @@ document.addEventListener('DOMContentLoaded', function() {
     // ==================== LOAD SERVICES ====================
     loadServices();
 
+    // ==================== FILTER PHONE INPUT ====================
+    const phoneInput = document.getElementById('phone');
+    if (phoneInput) {
+        phoneInput.addEventListener('input', function(e) {
+            // Remove all non-digits in real-time
+            this.value = this.value.replace(/\D/g, '');
+        });
+    }
+
     // ==================== BOOKING FORM SUBMISSION ====================
     const bookingForm = document.getElementById('bookingForm');
     if (bookingForm) {
@@ -72,12 +81,12 @@ document.addEventListener('DOMContentLoaded', function() {
 
             const formData = {
                 fullname: fullnameEl.value,
-                phone: phoneEl.value,
+                phone: phoneEl.value.replace(/\D/g, ''),  // Remove all non-digits (including +)
                 email: emailEl ? emailEl.value || '' : '',
-                service: serviceEl.value,
+                service: parseInt(serviceEl.value),
                 date: dateEl.value,
-                time: timeEl.value,
-                stylist: stylistEl ? stylistEl.value || null : null,
+                time: timeEl.value + ':00',  // Format time to HH:MM:SS
+                stylist: stylistEl && stylistEl.value ? parseInt(stylistEl.value) : null,
                 notes: notesEl ? notesEl.value : '',
                 send_email: sendEmailEl ? sendEmailEl.checked : true
             };
@@ -147,6 +156,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // ==================== SUBMIT BOOKING ====================
 function submitBooking(data) {
+    console.log('Sending booking data:', data);
+    
     // Show loading state
     const submitBtn = document.querySelector('.submit-button');
     if (submitBtn) {
@@ -165,8 +176,12 @@ function submitBooking(data) {
         body: JSON.stringify(data)
     })
     .then(response => {
+        console.log('Response status:', response.status);
         if (!response.ok) {
-            throw new Error('Booking failed');
+            return response.text().then(text => {
+                console.error('Error response:', text);
+                throw new Error('Booking failed: ' + text);
+            });
         }
         return response.json();
     })

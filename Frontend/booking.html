@@ -102,6 +102,23 @@
       color: green;
     }
 
+    .success-btn {
+      background: #c89b3c;
+      color: #fff;
+      border: none;
+      padding: 12px 30px;
+      font-size: 16px;
+      border-radius: 6px;
+      cursor: pointer;
+      margin-top: 20px;
+      text-decoration: none;
+      display: inline-block;
+    }
+
+    .success-btn:hover {
+      background: #b18933;
+    }
+
     footer {
       text-align: center;
       padding: 20px;
@@ -140,7 +157,7 @@
       <div class="form-row">
         <div class="form-group">
           <label>Phone Number *</label>
-          <input type="tel" id="phone" placeholder="0741464762" required>
+          <input type="text" id="phone" placeholder="0741464762" required>
         </div>
 
         <div class="form-group">
@@ -177,15 +194,14 @@
       <textarea id="notes" placeholder="Any special requests?"></textarea>
     </fieldset>
 
-    <button type="submit">Complete Booking</button>
+    <button type="submit" class="submit-button">Complete Booking</button>
 
   </form>
 
   <div class="success" id="successMessage">
     <h3>✅ Booking Received!</h3>
     <p>We’ll contact you shortly to confirm.</p>
-    <p>Thank you for choosing SM Salon & Spa 💛</p>
-  </div>
+    <p>Thank you for choosing SM Salon & Spa 💛</p>    <a href="index.html" class="success-btn">Back to Home</a>  </div>
 
 </div>
 
