@@ -17,29 +17,67 @@ from .serializers import (
 
 
 # ==================== SERVICE VIEWSET ====================
-class ServiceViewSet(viewsets.ReadOnlyModelViewSet):
+class ServiceViewSet(viewsets.ModelViewSet):
     """
-    List and retrieve services.
+    List, retrieve, create, and manage services.
     GET /api/services/
     GET /api/services/{id}/
+    POST /api/services/ - Create new service (admin only)
+    PUT /api/services/{id}/ - Update service (admin only)
+    DELETE /api/services/{id}/ - Delete service (admin only)
     """
-    queryset = Service.objects.filter(is_active=True)
+    queryset = Service.objects.all()
     serializer_class = ServiceSerializer
-    permission_classes = [AllowAny]
     filterset_fields = ['category']
+    
+    def get_permissions(self):
+        if self.action in ['create', 'update', 'partial_update', 'destroy']:
+            return [IsAuthenticated()]
+        return [AllowAny()]
+    
+    def get_queryset(self):
+        """Show inactive services to admins, only active to others"""
+        if self.request.user and self.request.user.is_authenticated:
+            return Service.objects.all()
+        return Service.objects.filter(is_active=True)
+    
+    def destroy(self, request, *args, **kwargs):
+        """Delete a service with proper error handling"""
+        try:
+            return super().destroy(request, *args, **kwargs)
+        except Exception as e:
+            if 'ProtectedError' in str(type(e)):
+                return Response(
+                    {'error': 'Cannot delete this service as it is used in existing bookings. Please mark it as inactive instead.'},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+            raise
 
 
 # ==================== STYLIST VIEWSET ====================
-class StylistViewSet(viewsets.ReadOnlyModelViewSet):
+class StylistViewSet(viewsets.ModelViewSet):
     """
-    List and retrieve stylists.
+    List, retrieve, create, and manage stylists.
     GET /api/stylists/
     GET /api/stylists/{id}/
+    POST /api/stylists/ - Create new stylist (admin only)
+    PUT /api/stylists/{id}/ - Update stylist (admin only)
+    DELETE /api/stylists/{id}/ - Delete stylist (admin only)
     GET /api/stylists/{id}/available-slots/?date=2026-01-20
     """
     queryset = Stylist.objects.filter(is_active=True)
     serializer_class = StylistSerializer
-    permission_classes = [AllowAny]
+    
+    def get_permissions(self):
+        if self.action in ['create', 'update', 'partial_update', 'destroy']:
+            return [IsAuthenticated()]
+        return [AllowAny()]
+    
+    def get_queryset(self):
+        """Show inactive stylists to admins, only active to others"""
+        if self.request.user and self.request.user.is_authenticated:
+            return Stylist.objects.all()
+        return Stylist.objects.filter(is_active=True)
     
     @action(detail=True, methods=['get'])
     def available_slots(self, request, pk=None):

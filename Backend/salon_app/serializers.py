@@ -5,7 +5,7 @@ from .models import Service, Stylist, Booking, ContactMessage, Review, SalonSett
 class ServiceSerializer(serializers.ModelSerializer):
     class Meta:
         model = Service
-        fields = ['id', 'name', 'category', 'description', 'price', 'duration_minutes']
+        fields = ['id', 'name', 'category', 'description', 'price', 'duration_minutes', 'is_active']
 
 
 # ==================== STYLIST SERIALIZER ====================
@@ -14,7 +14,7 @@ class StylistSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = Stylist
-        fields = ['id', 'name', 'specialization', 'bio', 'photo', 'available_services']
+        fields = ['id', 'name', 'email', 'phone', 'specialization', 'bio', 'photo', 'available_services', 'is_active']
 
 
 # ==================== BOOKING SERIALIZER ====================
@@ -51,9 +51,9 @@ class BookingCreateSerializer(serializers.ModelSerializer):
         return data
     
     def create(self, validated_data):
-        """Create booking and send confirmation email"""
+        """Create booking with pending status"""
         booking = Booking.objects.create(**validated_data)
-        booking.status = 'confirmed'
+        booking.status = 'pending'
         booking.save()
         
         # Send confirmation email

@@ -191,9 +191,27 @@
         .table-responsive {
             overflow-x: auto;
             overflow-y: auto;
-            max-height: 600px;
+            max-height: 70vh;
             border: 1px solid #ddd;
             border-radius: 6px;
+        }
+
+        .table-responsive::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .table-responsive::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+
+        .table-responsive::-webkit-scrollbar-thumb {
+            background: #c89b3c;
+            border-radius: 10px;
+        }
+
+        .table-responsive::-webkit-scrollbar-thumb:hover {
+            background: #b18933;
         }
 
         table {
@@ -334,6 +352,74 @@
 
         .success-message.show {
             display: block;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 2000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.4);
+            animation: fadeIn 0.3s;
+        }
+
+        .modal.show {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background-color: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+            max-width: 500px;
+            width: 90%;
+            animation: slideIn 0.3s;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .modal-header h2 {
+            margin: 0;
+            color: #333;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 28px;
+            cursor: pointer;
+            color: #666;
+            padding: 0;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-close:hover {
+            color: #333;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideIn {
+            from { transform: translateY(-50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
         }
 
         @media (max-width: 768px) {
@@ -629,6 +715,131 @@
         </main>
     </div>
 
+    <!-- Add Stylist Modal -->
+    <div id="addStylistModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Add New Stylist</h2>
+                <button class="modal-close" id="closeStylistModal">&times;</button>
+            </div>
+            <form id="addStylistForm">
+                <div class="form-group">
+                    <label for="stylistName">Name</label>
+                    <input type="text" id="stylistName" required>
+                </div>
+                <div class="form-group">
+                    <label for="stylistEmail">Email</label>
+                    <input type="email" id="stylistEmail" required>
+                </div>
+                <div class="form-group">
+                    <label for="stylistPhone">Phone</label>
+                    <input type="tel" id="stylistPhone" required>
+                </div>
+                <div class="form-group">
+                    <label for="stylistSpecialization">Specialization</label>
+                    <select id="stylistSpecialization" required>
+                        <option value="">Select Specialization</option>
+                        <option value="hair">Hair Specialist</option>
+                        <option value="nails">Nail Specialist</option>
+                        <option value="makeup">Makeup Artist</option>
+                        <option value="braiding">Braiding Expert</option>
+                        <option value="general">General</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="stylistBio">Bio</label>
+                    <textarea id="stylistBio"></textarea>
+                </div>
+                <button type="submit" class="btn-primary">Add Stylist</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Add Service Modal -->
+    <div id="addServiceModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Add New Service</h2>
+                <button class="modal-close" id="closeServiceModal">&times;</button>
+            </div>
+            <form id="addServiceForm">
+                <div class="form-group">
+                    <label for="serviceName">Service Name</label>
+                    <input type="text" id="serviceName" required>
+                </div>
+                <div class="form-group">
+                    <label for="serviceCategory">Category</label>
+                    <select id="serviceCategory" required>
+                        <option value="">Select Category</option>
+                        <option value="hair">Hair Services</option>
+                        <option value="nails">Nail Services</option>
+                        <option value="makeup">Makeup Services</option>
+                        <option value="braiding">Braiding & Weaves</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="serviceDescription">Description</label>
+                    <textarea id="serviceDescription" required></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="servicePrice">Price (KES)</label>
+                    <input type="number" id="servicePrice" step="0.01" min="0" required>
+                </div>
+                <div class="form-group">
+                    <label for="serviceDuration">Duration (minutes)</label>
+                    <input type="number" id="serviceDuration" min="1" required>
+                </div>
+                <button type="submit" class="btn-primary">Add Service</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Edit Service Modal -->
+    <div id="editServiceModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Edit Service</h2>
+                <button class="modal-close" id="closeEditServiceModal">&times;</button>
+            </div>
+            <form id="editServiceForm">
+                <input type="hidden" id="editServiceId">
+                <div class="form-group">
+                    <label for="editServiceName">Service Name</label>
+                    <input type="text" id="editServiceName" required>
+                </div>
+                <div class="form-group">
+                    <label for="editServiceCategory">Category</label>
+                    <select id="editServiceCategory" required>
+                        <option value="">Select Category</option>
+                        <option value="hair">Hair Services</option>
+                        <option value="nails">Nail Services</option>
+                        <option value="makeup">Makeup Services</option>
+                        <option value="braiding">Braiding & Weaves</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="editServiceDescription">Description</label>
+                    <textarea id="editServiceDescription" required></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="editServicePrice">Price (KES)</label>
+                    <input type="number" id="editServicePrice" step="0.01" min="0" required>
+                </div>
+                <div class="form-group">
+                    <label for="editServiceDuration">Duration (minutes)</label>
+                    <input type="number" id="editServiceDuration" min="1" required>
+                </div>
+                <div class="form-group">
+                    <label>
+                        <input type="checkbox" id="editServiceActive"> 
+                        Service is Active
+                    </label>
+                </div>
+                <button type="submit" class="btn-primary">Save Changes</button>
+            </form>
+        </div>
+    </div>
+
     <script>
         const API_BASE_URL = 'http://localhost:8000/api';
         let accessToken = localStorage.getItem('access_token');
@@ -701,17 +912,25 @@
 
         async function loadDashboard() {
             try {
-                const [bookings, stylists] = await Promise.all([
-                    fetch(`${API_BASE_URL}/bookings/`, {
+                // Fetch all bookings for accurate stats
+                let allBookings = [];
+                let nextUrl = `${API_BASE_URL}/bookings/?limit=100`;
+                
+                while (nextUrl) {
+                    const response = await fetch(nextUrl, {
                         headers: { 'Authorization': `Bearer ${accessToken}` }
-                    }).then(r => r.json()),
-                    fetch(`${API_BASE_URL}/stylists/`, {
-                        headers: { 'Authorization': `Bearer ${accessToken}` }
-                    }).then(r => r.json())
-                ]);
+                    });
+                    const data = await response.json();
+                    allBookings = allBookings.concat(data.results || []);
+                    nextUrl = data.next || null;
+                }
 
-                const bookingResults = Array.isArray(bookings) ? bookings : bookings.results || [];
-                const stylistResults = Array.isArray(stylists) ? stylists : stylists.results || [];
+                const stylistsResponse = await fetch(`${API_BASE_URL}/stylists/`, {
+                    headers: { 'Authorization': `Bearer ${accessToken}` }
+                }).then(r => r.json());
+
+                const bookingResults = allBookings;
+                const stylistResults = Array.isArray(stylistsResponse) ? stylistsResponse : stylistsResponse.results || [];
 
                 document.getElementById('totalBookings').textContent = bookingResults.length;
                 document.getElementById('confirmedBookings').textContent = 
@@ -731,18 +950,43 @@
 
         async function loadBookings() {
             try {
-                const response = await fetch(`${API_BASE_URL}/bookings/`, {
-                    headers: { 'Authorization': `Bearer ${accessToken}` }
-                });
-                const data = await response.json();
-                const bookings = Array.isArray(data) ? data : data.results || [];
+                // Fetch all bookings with pagination handling
+                let allBookings = [];
+                let nextUrl = `${API_BASE_URL}/bookings/?limit=100`;
+                
+                while (nextUrl) {
+                    const response = await fetch(nextUrl, {
+                        headers: { 'Authorization': `Bearer ${accessToken}` }
+                    });
+                    if (!response.ok) {
+                        throw new Error(`API error: ${response.status}`);
+                    }
+                    const data = await response.json();
+                    console.log('Page response:', data); // Debug log
+                    allBookings = allBookings.concat(data.results || []);
+                    nextUrl = data.next || null;
+                }
+                
+                console.log('Total bookings fetched:', allBookings.length); // Debug log
+                const bookings = allBookings;
 
-                const tbody = document.getElementById('bookingsTable') 
+                const isFullBookingsPage = document.getElementById('bookingsTable') ? true : false;
+                const tbody = isFullBookingsPage
                     ? document.getElementById('bookingsTable').querySelector('tbody')
                     : document.getElementById('recentBookingsTable').querySelector('tbody');
 
                 tbody.innerHTML = '';
-                bookings.slice(0, 5).forEach(booking => {
+                
+                // Show all bookings on full page, only 5 on dashboard
+                const bookingsToShow = isFullBookingsPage ? bookings : bookings.slice(0, 5);
+                
+                bookingsToShow.forEach(booking => {
+                    const statusClass = booking.status === 'confirmed' ? 'success' : 
+                                      booking.status === 'pending' ? 'warning' : 'danger';
+                    const actionButton = isFullBookingsPage && booking.status === 'pending' 
+                        ? `<button class="btn-primary confirm-booking-btn" style="padding: 5px 10px; font-size: 12px;" data-id="${booking.id}">Confirm</button>` 
+                        : '<span style="font-size: 12px; color: #666;">-</span>';
+                    
                     tbody.innerHTML += `
                         <tr>
                             <td>${booking.fullname || 'N/A'}</td>
@@ -751,11 +995,18 @@
                             <td>${booking.stylist_name || 'N/A'}</td>
                             <td>${booking.date || 'N/A'}</td>
                             <td>${booking.time || 'N/A'}</td>
-                            <td><span class="badge badge-${booking.status === 'confirmed' ? 'success' : 'warning'}">${booking.status}</span></td>
-                            ${document.getElementById('bookingsTable') ? '<td><button class="btn-primary" style="padding: 5px 10px; font-size: 12px;">Edit</button></td>' : ''}
+                            <td><span class="badge badge-${statusClass}">${booking.status}</span></td>
+                            ${isFullBookingsPage ? `<td>${actionButton}</td>` : ''}
                         </tr>
                     `;
                 });
+
+                // Add event listeners to confirm buttons
+                if (isFullBookingsPage) {
+                    document.querySelectorAll('.confirm-booking-btn').forEach(btn => {
+                        btn.addEventListener('click', (e) => confirmBooking(e.target.dataset.id));
+                    });
+                }
             } catch (error) {
                 console.error('Error loading bookings:', error);
                 const errorDiv = document.getElementById('bookingsError') || document.getElementById('dashboardError');
@@ -784,7 +1035,9 @@
                             <td>${stylist.email || 'N/A'}</td>
                             <td>${stylist.phone || 'N/A'}</td>
                             <td>${stylist.specialization || 'N/A'}</td>
-                            <td><span class="badge badge-success">Active</span></td>
+                            <td><span class="badge ${stylist.is_active ? 'badge-success' : 'badge-danger'}">
+                                ${stylist.is_active ? 'Active' : 'Inactive'}
+                            </span></td>
                             <td><button class="btn-primary" style="padding: 5px 10px; font-size: 12px;">Edit</button></td>
                         </tr>
                     `;
@@ -821,10 +1074,25 @@
                             <td>${service.category || 'N/A'}</td>
                             <td>${service.price || '0'}</td>
                             <td>${service.duration_minutes || 'N/A'}</td>
-                            <td><span class="badge badge-success">Active</span></td>
-                            <td><button class="btn-primary" style="padding: 5px 10px; font-size: 12px;">Edit</button></td>
+                            <td><span class="badge ${service.is_active ? 'badge-success' : 'badge-danger'}">
+                                ${service.is_active ? 'Active' : 'Inactive'}
+                            </span></td>
+                            <td>
+                                <button class="btn-primary edit-service-btn" style="padding: 5px 10px; font-size: 12px;" data-id="${service.id}">Edit</button>
+                                <button class="btn-primary delete-service-btn" style="padding: 5px 10px; font-size: 12px; background: #dc3545; margin-left: 5px;" data-id="${service.id}">Delete</button>
+                            </td>
                         </tr>
                     `;
+                });
+
+                // Add event listeners to edit buttons
+                document.querySelectorAll('.edit-service-btn').forEach(btn => {
+                    btn.addEventListener('click', (e) => openEditServiceModal(e.target.dataset.id, allServices));
+                });
+
+                // Add event listeners to delete buttons
+                document.querySelectorAll('.delete-service-btn').forEach(btn => {
+                    btn.addEventListener('click', (e) => deleteService(e.target.dataset.id));
                 });
             } catch (error) {
                 console.error('Error loading services:', error);
@@ -832,6 +1100,7 @@
                 document.getElementById('servicesError').classList.add('show');
             }
         }
+
 
         async function loadContacts() {
             try {
@@ -943,6 +1212,255 @@
                 document.getElementById('profileError').classList.add('show');
             }
         });
+
+        // Confirm Booking Function
+        async function confirmBooking(bookingId) {
+            if (!confirm('Are you sure you want to confirm this booking?')) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/bookings/${bookingId}/confirm/`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${accessToken}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (!response.ok) {
+                    const error = await response.json();
+                    throw new Error(error.error || 'Failed to confirm booking');
+                }
+
+                // Reload bookings table
+                showSection('bookings');
+            } catch (error) {
+                console.error('Error confirming booking:', error);
+                const bookingsError = document.getElementById('bookingsError');
+                if (bookingsError) {
+                    bookingsError.textContent = error.message;
+                    bookingsError.classList.add('show');
+                }
+            }
+        }
+
+        // Stylist Modal Handlers
+        document.getElementById('addStylistBtn').addEventListener('click', () => {
+            document.getElementById('addStylistModal').classList.add('show');
+        });
+
+        document.getElementById('closeStylistModal').addEventListener('click', () => {
+            document.getElementById('addStylistModal').classList.remove('show');
+        });
+
+        document.getElementById('addStylistModal').addEventListener('click', (e) => {
+            if (e.target.id === 'addStylistModal') {
+                document.getElementById('addStylistModal').classList.remove('show');
+            }
+        });
+
+        document.getElementById('addStylistForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const stylistData = {
+                name: document.getElementById('stylistName').value,
+                email: document.getElementById('stylistEmail').value,
+                phone: document.getElementById('stylistPhone').value,
+                specialization: document.getElementById('stylistSpecialization').value,
+                bio: document.getElementById('stylistBio').value
+            };
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/stylists/`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${accessToken}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(stylistData)
+                });
+
+                if (!response.ok) {
+                    const error = await response.json();
+                    throw new Error(JSON.stringify(error));
+                }
+
+                // Close modal and reload stylists
+                document.getElementById('addStylistModal').classList.remove('show');
+                document.getElementById('addStylistForm').reset();
+                
+                // Show success message
+                const stylistsError = document.getElementById('stylistsError');
+                if (stylistsError) {
+                    stylistsError.textContent = 'Stylist added successfully!';
+                    stylistsError.classList.remove('show');
+                }
+                
+                loadStylists();
+            } catch (error) {
+                console.error('Error adding stylist:', error);
+                const stylistsError = document.getElementById('stylistsError');
+                if (stylistsError) {
+                    stylistsError.textContent = 'Error adding stylist: ' + error.message;
+                    stylistsError.classList.add('show');
+                }
+            }
+        });
+
+        // Service Modal Handlers
+        document.getElementById('addServiceBtn').addEventListener('click', () => {
+            document.getElementById('addServiceModal').classList.add('show');
+        });
+
+        document.getElementById('closeServiceModal').addEventListener('click', () => {
+            document.getElementById('addServiceModal').classList.remove('show');
+        });
+
+        document.getElementById('addServiceModal').addEventListener('click', (e) => {
+            if (e.target.id === 'addServiceModal') {
+                document.getElementById('addServiceModal').classList.remove('show');
+            }
+        });
+
+        document.getElementById('closeEditServiceModal').addEventListener('click', () => {
+            document.getElementById('editServiceModal').classList.remove('show');
+        });
+
+        document.getElementById('editServiceModal').addEventListener('click', (e) => {
+            if (e.target.id === 'editServiceModal') {
+                document.getElementById('editServiceModal').classList.remove('show');
+            }
+        });
+
+        // Add Service Form Handler
+        document.getElementById('addServiceForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const serviceData = {
+                name: document.getElementById('serviceName').value,
+                category: document.getElementById('serviceCategory').value,
+                description: document.getElementById('serviceDescription').value,
+                price: parseFloat(document.getElementById('servicePrice').value),
+                duration_minutes: parseInt(document.getElementById('serviceDuration').value)
+            };
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/services/`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${accessToken}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(serviceData)
+                });
+
+                if (!response.ok) {
+                    const error = await response.json();
+                    throw new Error(JSON.stringify(error));
+                }
+
+                // Close modal and reload services
+                document.getElementById('addServiceModal').classList.remove('show');
+                document.getElementById('addServiceForm').reset();
+                loadServices();
+            } catch (error) {
+                console.error('Error adding service:', error);
+                const servicesError = document.getElementById('servicesError');
+                if (servicesError) {
+                    servicesError.textContent = 'Error adding service: ' + error.message;
+                    servicesError.classList.add('show');
+                }
+            }
+        });
+
+        // Edit Service Form Handler
+        document.getElementById('editServiceForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const serviceId = document.getElementById('editServiceId').value;
+            const serviceData = {
+                name: document.getElementById('editServiceName').value,
+                category: document.getElementById('editServiceCategory').value,
+                description: document.getElementById('editServiceDescription').value,
+                price: parseFloat(document.getElementById('editServicePrice').value),
+                duration_minutes: parseInt(document.getElementById('editServiceDuration').value),
+                is_active: document.getElementById('editServiceActive').checked
+            };
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/services/${serviceId}/`, {
+                    method: 'PUT',
+                    headers: {
+                        'Authorization': `Bearer ${accessToken}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(serviceData)
+                });
+
+                if (!response.ok) {
+                    const error = await response.json();
+                    throw new Error(JSON.stringify(error));
+                }
+
+                // Close modal and reload services
+                document.getElementById('editServiceModal').classList.remove('show');
+                loadServices();
+            } catch (error) {
+                console.error('Error updating service:', error);
+                const servicesError = document.getElementById('servicesError');
+                if (servicesError) {
+                    servicesError.textContent = 'Error updating service: ' + error.message;
+                    servicesError.classList.add('show');
+                }
+            }
+        });
+
+        // Open Edit Service Modal
+        function openEditServiceModal(serviceId, allServices) {
+            const service = allServices.find(s => s.id == serviceId);
+            if (!service) return;
+
+            document.getElementById('editServiceId').value = service.id;
+            document.getElementById('editServiceName').value = service.name;
+            document.getElementById('editServiceCategory').value = service.category;
+            document.getElementById('editServiceDescription').value = service.description;
+            document.getElementById('editServicePrice').value = service.price;
+            document.getElementById('editServiceDuration').value = service.duration_minutes;
+            document.getElementById('editServiceActive').checked = service.is_active;
+
+            document.getElementById('editServiceModal').classList.add('show');
+        }
+
+        // Delete Service
+        async function deleteService(serviceId) {
+            if (!confirm('Are you sure you want to delete this service?')) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/services/${serviceId}/`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Authorization': `Bearer ${accessToken}`
+                    }
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.error || 'Failed to delete service');
+                }
+
+                loadServices();
+            } catch (error) {
+                console.error('Error deleting service:', error);
+                const servicesError = document.getElementById('servicesError');
+                if (servicesError) {
+                    servicesError.textContent = error.message;
+                    servicesError.classList.add('show');
+                }
+            }
+        }
 
         document.getElementById('logoutBtn').addEventListener('click', () => {
             localStorage.removeItem('access_token');
