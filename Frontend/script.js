@@ -1,6 +1,6 @@
 // ==================== API CONFIGURATION ====================
 const API_CONFIG = {
-    BASE_URL: 'http://localhost:8000/api', // Change to your backend URL
+    BASE_URL: 'https://plankton-app-q4rym.ondigitalocean.app/api', // Change to your backend URL
     TIMEOUT: 10000,
     DEBUG: true
 };
