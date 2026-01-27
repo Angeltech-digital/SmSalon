@@ -314,16 +314,25 @@ function loadServices() {
     const serviceSelect = document.getElementById('service');
     if (!serviceSelect) return;
 
+    console.log('Loading services from:', API_ENDPOINTS.services + '?limit=100');
+
     // Fetch all services by requesting with a high limit
     fetch(API_ENDPOINTS.services + '?limit=100', {
         method: 'GET',
         headers: { 'Content-Type': 'application/json' }
     })
-    .then(response => response.json())
+    .then(response => {
+        console.log('Services response status:', response.status);
+        if (!response.ok) {
+            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        }
+        return response.json();
+    })
     .then(data => {
+        console.log('Services data received:', data);
         // Handle paginated response
         let allServices = data.results || (Array.isArray(data) ? data : []);
-        
+
         // If there are more pages, fetch them recursively
         if (data.next) {
             const fetchNextPage = (nextUrl) => {
@@ -342,6 +351,7 @@ function loadServices() {
         return allServices;
     })
     .then(services => {
+        console.log('All services:', services);
         // Group services by category
         const grouped = {};
         services.forEach(service => {
@@ -358,16 +368,18 @@ function loadServices() {
         Object.keys(grouped).sort().forEach(category => {
             const optgroup = document.createElement('optgroup');
             optgroup.label = category.charAt(0).toUpperCase() + category.slice(1) + ' Services';
-            
+
             grouped[category].forEach(service => {
                 const option = document.createElement('option');
                 option.value = service.id;
                 option.textContent = `${service.name} – KES ${service.price}`;
                 optgroup.appendChild(option);
             });
-            
+
             serviceSelect.appendChild(optgroup);
         });
+
+        console.log('Services loaded successfully');
     })
     .catch(error => {
         console.error('Error loading services:', error);
