@@ -345,33 +345,50 @@ class LoginView(APIView):
     """
     User login endpoint.
     POST /api/auth/login/
-    
+
     Required fields: username, password
     """
     permission_classes = [AllowAny]
-    
+
     def post(self, request):
+        import logging
+        logger = logging.getLogger(__name__)
+
         username = request.data.get('username')
         password = request.data.get('password')
-        
+
         if not username or not password:
             return Response(
                 {'error': 'Username and password are required'},
                 status=status.HTTP_400_BAD_REQUEST
             )
-        
-        # Authenticate user
-        user = authenticate(username=username, password=password)
-        
+
+        # Authenticate user with proper error handling
+        try:
+            user = authenticate(username=username, password=password)
+        except Exception as e:
+            logger.error(f"Authentication error for user '{username}': {e}")
+            return Response(
+                {'error': 'Authentication failed. Please try again.'},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+
         if user is None:
             return Response(
                 {'error': 'Invalid username or password'},
                 status=status.HTTP_401_UNAUTHORIZED
             )
-        
+
         # Generate tokens
-        refresh = RefreshToken.for_user(user)
-        
+        try:
+            refresh = RefreshToken.for_user(user)
+        except Exception as e:
+            logger.error(f"Token generation error for user '{username}': {e}")
+            return Response(
+                {'error': 'Failed to generate authentication tokens.'},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+
         return Response({
             'message': 'Login successful',
             'user': {

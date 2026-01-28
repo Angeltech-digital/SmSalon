@@ -10,6 +10,9 @@ from .views import (
     SalonSettingsViewSet,
     health_check,
     LoginView,
+    SignupView,
+    LogoutView,
+    UserProfileView,
 )
 
 # ---------------------------
@@ -29,5 +32,8 @@ router.register(r'settings', SalonSettingsViewSet, basename='settings')
 urlpatterns = [
     path('', include(router.urls)),
     path('health/', health_check, name='health-check'),
+    path('auth/signup/', SignupView.as_view(), name='signup'),
     path('auth/login/', LoginView.as_view(), name='login'),
+    path('auth/logout/', LogoutView.as_view(), name='logout'),
+    path('auth/profile/', UserProfileView.as_view(), name='profile'),
 ]
