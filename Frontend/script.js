@@ -1,507 +1,329 @@
 // ==================== API CONFIGURATION ====================
+// Default to local backend
+let BASE_URL = 'http://127.0.0.1:8000/api';
+const PROD_API_URL = 'https://your-production-domain.com/api';
+
+// Override if user explicitly wants production
+if (localStorage.getItem('apiEnvironment') === 'production') {
+    BASE_URL = PROD_API_URL;
+}
+
+// Save preference for future visits
+localStorage.setItem('useLocalApi', BASE_URL === 'http://127.0.0.1:8000/api' ? 'true' : 'false');
+
+// Unified API_CONFIG object for all scripts
 const API_CONFIG = {
-    BASE_URL: 'https://plankton-app-q4rym.ondigitalocean.app/api', // Change to your backend URL
-    TIMEOUT: 10000,
+    BASE_URL,
     DEBUG: true
 };
 
 const API_ENDPOINTS = {
-    bookings: `${API_CONFIG.BASE_URL}/bookings/`,
-    contacts: `${API_CONFIG.BASE_URL}/contacts/`,
-    services: `${API_CONFIG.BASE_URL}/services/`,
-    settings: `${API_CONFIG.BASE_URL}/settings/current/`,
-    health: `${API_CONFIG.BASE_URL}/health/`,
+    bookings: `${BASE_URL}/bookings/`,
+    contacts: `${BASE_URL}/contacts/`,
+    services: `${BASE_URL}/services/`,
+    settings: `${BASE_URL}/settings/current/`,
+    health: `${BASE_URL}/health/`,
+    authLogin: `${BASE_URL}/auth/login/`
 };
 
 // ==================== SALON CONFIGURATION ====================
 const SALON_INFO = {
-    name: 'Salon',
-    phone: '+254712345678',
-    whatsapp: '254712345678',
-    email: 'info@salon.com',
-    address: '123 Beauty Lane, Nairobi, Kenya'
+    name: 'SM Salon Barbershop',
+    phone: '+254 741 464 762',
+    whatsapp: '+254 741 464 762',
+    email: 'info@sm-salon.com',
+    address: 'Homeland, Nairobi, Kenya'
 };
 
-// ==================== MOBILE MENU TOGGLE ====================
-document.addEventListener('DOMContentLoaded', function() {
-    const hamburger = document.querySelector('.hamburger');
-    const navLinks = document.querySelector('.nav-links');
+// ==================== GLOBAL FLAGS ====================
+window.IS_OFFLINE = false;
 
-    if (hamburger) {
-        hamburger.addEventListener('click', function() {
-            navLinks.classList.toggle('active');
-        });
-
-        // Close menu when a link is clicked
-        const links = navLinks.querySelectorAll('a');
-        links.forEach(link => {
-            link.addEventListener('click', function() {
-                navLinks.classList.remove('active');
-            });
-        });
-    }
-    
-    // Check backend connectivity
+// ==================== DOM CONTENT LOADED ====================
+document.addEventListener('DOMContentLoaded', () => {
+    setupMobileMenu();
     checkBackendConnection();
-
-    // ==================== LOAD SERVICES ====================
     loadServices();
-
-    // ==================== FILTER PHONE INPUT ====================
-    const phoneInput = document.getElementById('phone');
-    if (phoneInput) {
-        phoneInput.addEventListener('input', function(e) {
-            // Remove all non-digits in real-time
-            this.value = this.value.replace(/\D/g, '');
-        });
-    }
-
-    // ==================== BOOKING FORM SUBMISSION ====================
-    const bookingForm = document.getElementById('bookingForm');
-    if (bookingForm) {
-        bookingForm.addEventListener('submit', function(e) {
-            e.preventDefault();
-
-            // Get form data with null safety checks
-            const fullnameEl = document.getElementById('fullname');
-            const phoneEl = document.getElementById('phone');
-            const emailEl = document.getElementById('email');
-            const serviceEl = document.getElementById('service');
-            const dateEl = document.getElementById('date');
-            const timeEl = document.getElementById('time');
-            const stylistEl = document.getElementById('stylist');
-            const notesEl = document.getElementById('notes');
-            const sendEmailEl = document.getElementById('sendEmail');
-
-            // Validate all elements exist before accessing
-            if (!fullnameEl || !phoneEl || !serviceEl || !dateEl || !timeEl) {
-                console.error('Form elements not found');
-                return;
-            }
-
-            const formData = {
-                fullname: fullnameEl.value,
-                phone: phoneEl.value.replace(/\D/g, ''),  // Remove all non-digits (including +)
-                email: emailEl ? emailEl.value || '' : '',
-                service: parseInt(serviceEl.value),
-                date: dateEl.value,
-                time: timeEl.value + ':00',  // Format time to HH:MM:SS
-                stylist: stylistEl && stylistEl.value ? parseInt(stylistEl.value) : null,
-                notes: notesEl ? notesEl.value : '',
-                send_email: sendEmailEl ? sendEmailEl.checked : true
-            };
-
-            // Validate form
-            if (!formData.fullname || !formData.phone || !formData.service || !formData.date || !formData.time) {
-                alert('Please fill in all required fields');
-                return;
-            }
-
-            // Validate phone number (basic check)
-            if (!/^\+?[0-9]{7,}$/.test(formData.phone.replace(/\s/g, ''))) {
-                alert('Please enter a valid phone number');
-                return;
-            }
-
-            // Validate date is not in the past
-            const selectedDate = new Date(formData.date);
-            const today = new Date();
-            today.setHours(0, 0, 0, 0);
-            if (selectedDate < today) {
-                alert('Please select a future date');
-                return;
-            }
-
-                    // Send booking data to backend
-            submitBooking(formData);
-        });
-    }
-
-    // ==================== CONTACT FORM SUBMISSION ====================
-    const contactForm = document.getElementById('contactForm');
-    if (contactForm) {
-        contactForm.addEventListener('submit', function(e) {
-            e.preventDefault();
-
-            const nameEl = document.getElementById('name');
-            const emailEl = document.getElementById('contact-email');
-            const subjectEl = document.getElementById('subject');
-            const messageEl = document.getElementById('message');
-
-            // Validate elements exist
-            if (!nameEl || !emailEl || !subjectEl || !messageEl) {
-                console.error('Contact form elements not found');
-                return;
-            }
-
-            const formData = {
-                name: nameEl.value,
-                email: emailEl.value,
-                subject: subjectEl.value,
-                message: messageEl.value
-            };
-
-            // Send contact message
-            submitContact(formData);
-        });
-    }
-
-    // ==================== SET MINIMUM DATE FOR BOOKING ====================
-    const dateInput = document.getElementById('date');
-    if (dateInput) {
-        const today = new Date().toISOString().split('T')[0];
-        dateInput.setAttribute('min', today);
-    }
+    setupBookingForm();
+    setupContactForm();
+    setMinDate();
+    formatPhoneNumber('phone');
+    validateTimeSlot();
+    autoSaveForm();
+    setupSmoothScroll();
+    highlightActiveNav();
 });
 
-// ==================== SUBMIT BOOKING ====================
-function submitBooking(data) {
-    console.log('Sending booking data:', data);
-    
-    // Show loading state
-    const submitBtn = document.querySelector('.submit-button');
-    if (submitBtn) {
-        const originalText = submitBtn.textContent;
-        submitBtn.textContent = 'Processing...';
-        submitBtn.disabled = true;
+// ==================== MOBILE MENU ====================
+function setupMobileMenu() {
+    const hamburger = document.querySelector('.hamburger');
+    const navLinks = document.querySelector('.nav-links');
+    if (!hamburger || !navLinks) return;
+
+    hamburger.addEventListener('click', () => navLinks.classList.toggle('active'));
+    navLinks.querySelectorAll('a').forEach(link => link.addEventListener('click', () => navLinks.classList.remove('active')));
+}
+
+// ==================== BACKEND HEALTH CHECK ====================
+async function checkBackendConnection() {
+    try {
+        const res = await fetch(API_ENDPOINTS.health, { method: 'GET', headers: { 'Content-Type': 'application/json' } });
+        if (!res.ok) throw new Error(`Status ${res.status}`);
+        const data = await res.json();
+        if (API_CONFIG.DEBUG) console.log('✅ Backend connected:', data);
+    } catch (err) {
+        console.warn('⚠️ Backend not available. Running in offline mode.');
+        console.warn('API Base URL:', BASE_URL);
+        window.IS_OFFLINE = true;
+    }
+}
+
+// ==================== LOAD SERVICES ====================
+async function loadServices() {
+    const serviceSelect = document.getElementById('service');
+    if (!serviceSelect) return;
+
+    if (window.IS_OFFLINE) {
+        displayServices(getOfflineServices());
+        return;
     }
 
-    // Send to backend
-    fetch(API_ENDPOINTS.bookings, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'X-CSRFToken': getCookie('csrftoken')
-        },
-        body: JSON.stringify(data)
-    })
-    .then(response => {
-        console.log('Response status:', response.status);
-        if (!response.ok) {
-            return response.text().then(text => {
-                console.error('Error response:', text);
-                throw new Error('Booking failed: ' + text);
-            });
-        }
-        return response.json();
-    })
-    .then(result => {
-        console.log('Booking successful:', result);
-        
-        // Hide form and show success message
-        const bookingForm = document.getElementById('bookingForm');
-        const successMessage = document.getElementById('successMessage');
-        
-        if (bookingForm) {
-            bookingForm.style.display = 'none';
-        }
-        
-        if (successMessage) {
-            successMessage.style.display = 'block';
-            // Scroll to success message
-            successMessage.scrollIntoView({ behavior: 'smooth' });
-        }
+    try {
+        const res = await fetch(`${API_ENDPOINTS.services}?limit=100`, { method: 'GET', headers: { 'Content-Type': 'application/json' } });
+        if (!res.ok) throw new Error(`Status ${res.status}`);
+        const data = await res.json();
+        const allServices = data.results || (Array.isArray(data) ? data : []);
+        displayServices(allServices);
+    } catch (err) {
+        console.warn('⚠️ Could not load services, using offline fallback.', err);
+        displayServices(getOfflineServices());
+    }
+}
 
-        // Send WhatsApp notification
-        sendWhatsAppNotification(data);
-    })
-    .catch(error => {
-        console.error('Error:', error);
-        alert('Booking failed. Please try again or contact us directly.');
-        
-        const submitBtn = document.querySelector('.submit-button');
-        if (submitBtn) {
-            submitBtn.textContent = 'Book Now';
-            submitBtn.disabled = false;
-        }
+function getOfflineServices() {
+    return [
+        { id: 1, name: 'Haircut & Styling', category: 'hair', price: 500 },
+        { id: 2, name: 'Hair Coloring', category: 'hair', price: 2000 },
+        { id: 3, name: 'Manicure', category: 'nails', price: 300 },
+        { id: 4, name: 'Pedicure', category: 'nails', price: 400 },
+        { id: 5, name: 'Full Makeup', category: 'makeup', price: 1500 },
+        { id: 6, name: 'Braiding', category: 'braiding', price: 1000 },
+        { id: 7, name: 'Weave Installation', category: 'braiding', price: 2500 },
+        { id: 8, name: 'Facial Treatment', category: 'hair', price: 800 },
+    ];
+}
+
+function displayServices(services) {
+    const serviceSelect = document.getElementById('service');
+    if (!serviceSelect) return;
+
+    const grouped = {};
+    services.forEach(service => {
+        const category = service.category || 'general';
+        if (!grouped[category]) grouped[category] = [];
+        grouped[category].push(service);
+    });
+
+    serviceSelect.innerHTML = '<option value="">-- Choose Service --</option>';
+    Object.keys(grouped).sort().forEach(cat => {
+        const optgroup = document.createElement('optgroup');
+        optgroup.label = cat.charAt(0).toUpperCase() + cat.slice(1) + ' Services';
+        grouped[cat].forEach(service => {
+            const option = document.createElement('option');
+            option.value = service.id;
+            option.textContent = `${service.name}${service.price ? ` – KES ${service.price}` : ''}`;
+            optgroup.appendChild(option);
+        });
+        serviceSelect.appendChild(optgroup);
     });
 }
 
-// ==================== SUBMIT CONTACT ====================
-function submitContact(data) {
+// ==================== BOOKING FORM ====================
+function setupBookingForm() {
+    const form = document.getElementById('bookingForm');
+    if (!form) return;
+
+    form.addEventListener('submit', e => {
+        e.preventDefault();
+        const fullname = document.getElementById('fullname')?.value || '';
+        const phone = document.getElementById('phone')?.value.replace(/\D/g, '') || '';
+        const email = document.getElementById('email')?.value || '';
+        const service = parseInt(document.getElementById('service')?.value) || null;
+        const date = document.getElementById('date')?.value || '';
+        const time = document.getElementById('time')?.value + ':00' || '';
+        const stylist = parseInt(document.getElementById('stylist')?.value) || null;
+        const notes = document.getElementById('notes')?.value || '';
+        const send_email = document.getElementById('sendEmail')?.checked ?? true;
+
+        if (!fullname || !phone || !service || !date || !time) {
+            alert('Please fill in all required fields');
+            return;
+        }
+
+        if (!/^\+?[0-9]{7,}$/.test(phone.replace(/\s/g, ''))) {
+            alert('Please enter a valid phone number');
+            return;
+        }
+
+        const selectedDate = new Date(date);
+        const today = new Date();
+        today.setHours(0,0,0,0);
+        if (selectedDate < today) {
+            alert('Please select a future date');
+            return;
+        }
+
+        submitBooking({ fullname, phone, email, service, date, time, stylist, notes, send_email });
+    });
+}
+
+// ==================== SUBMIT BOOKING ====================
+async function submitBooking(data) {
+    const submitBtn = document.querySelector('.submit-button');
+    if (submitBtn) { submitBtn.textContent = 'Processing...'; submitBtn.disabled = true; }
+
+    if (window.IS_OFFLINE) {
+        alert('Booking stored offline. Backend is not connected.');
+        if (submitBtn) { submitBtn.textContent = 'Book Now'; submitBtn.disabled = false; }
+        return;
+    }
+
+    try {
+        const res = await fetch(API_ENDPOINTS.bookings, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'X-CSRFToken': getCookie('csrftoken') },
+            body: JSON.stringify(data)
+        });
+        if (!res.ok) throw new Error(await res.text());
+        await res.json();
+        document.getElementById('bookingForm').style.display = 'none';
+        document.getElementById('successMessage').style.display = 'block';
+        sendWhatsAppNotification(data);
+    } catch (err) {
+        console.error(err);
+        alert('Booking failed. Please try again.');
+        if (submitBtn) { submitBtn.textContent = 'Book Now'; submitBtn.disabled = false; }
+    }
+}
+
+// ==================== CONTACT FORM ====================
+function setupContactForm() {
+    const form = document.getElementById('contactForm');
+    if (!form) return;
+
+    form.addEventListener('submit', e => {
+        e.preventDefault();
+        const data = {
+            name: document.getElementById('name')?.value || '',
+            email: document.getElementById('contact-email')?.value || '',
+            subject: document.getElementById('subject')?.value || '',
+            message: document.getElementById('message')?.value || ''
+        };
+        submitContact(data);
+    });
+}
+
+async function submitContact(data) {
     const submitBtn = document.querySelector('.submit-button');
     if (!submitBtn) return;
-    
     const originalText = submitBtn.textContent;
     submitBtn.textContent = 'Sending...';
     submitBtn.disabled = true;
 
-    fetch(API_ENDPOINTS.contacts, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'X-CSRFToken': getCookie('csrftoken')
-        },
-        body: JSON.stringify(data)
-    })
-    .then(response => {
-        if (!response.ok) {
-            throw new Error('Message failed');
-        }
-        return response.json();
-    })
-    .then(result => {
-        console.log('Message sent:', result);
-        alert('Thank you! We received your message. We\'ll be in touch soon.');
-        const contactForm = document.getElementById('contactForm');
-        if (contactForm) {
-            contactForm.reset();
-        }
+    if (window.IS_OFFLINE) {
+        alert('Message stored offline. Backend is not connected.');
         submitBtn.textContent = originalText;
         submitBtn.disabled = false;
-    })
-    .catch(error => {
-        console.error('Error:', error);
-        alert('Failed to send message. Please try again.');
-        submitBtn.textContent = originalText;
-        submitBtn.disabled = false;
-    });
-}
-
-// ==================== GET CSRF TOKEN ====================
-function getCookie(name) {
-    let cookieValue = null;
-    if (document.cookie && document.cookie !== '') {
-        const cookies = document.cookie.split(';');
-        for (let i = 0; i < cookies.length; i++) {
-            const cookie = cookies[i].trim();
-            if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                break;
-            }
-        }
+        return;
     }
-    return cookieValue;
+
+    try {
+        const res = await fetch(API_ENDPOINTS.contacts, {
+            method:'POST',
+            headers:{'Content-Type':'application/json','X-CSRFToken': getCookie('csrftoken')},
+            body: JSON.stringify(data)
+        });
+        if (!res.ok) throw new Error('Message failed');
+        await res.json();
+        alert('Message sent!');
+        document.getElementById('contactForm').reset();
+        submitBtn.textContent = originalText;
+        submitBtn.disabled = false;
+    } catch (err) {
+        alert('Failed to send message.');
+        submitBtn.textContent = originalText;
+        submitBtn.disabled = false;
+    }
 }
 
-// ==================== SEND WHATSAPP NOTIFICATION ====================
-function sendWhatsAppNotification(bookingData) {
-    // This sends a booking confirmation message via WhatsApp
-    // WhatsApp click-to-chat link (to the salon)
-    
-    const message = encodeURIComponent(
-        `Hello! I've booked an appointment:\n\n` +
-        `Name: ${bookingData.fullname}\n` +
-        `Service: ${bookingData.service}\n` +
-        `Date: ${bookingData.date}\n` +
-        `Time: ${bookingData.time}\n` +
-        `Phone: ${bookingData.phone}`
-    );
+// ==================== HELPER FUNCTIONS ====================
+function getCookie(name) {
+    const cookies = document.cookie.split(';').map(c => c.trim());
+    for (let cookie of cookies) {
+        if (cookie.startsWith(name + '=')) return decodeURIComponent(cookie.split('=')[1]);
+    }
+    return null;
+}
 
-    // Send to salon WhatsApp
+function sendWhatsAppNotification(data) {
+    const message = encodeURIComponent(
+        `Hello! I've booked an appointment:\nName: ${data.fullname}\nService: ${data.service}\nDate: ${data.date}\nTime: ${data.time}\nPhone: ${data.phone}`
+    );
     window.open(`https://wa.me/${SALON_INFO.whatsapp}?text=${message}`, '_blank');
 }
 
-// ==================== CHECK BACKEND CONNECTION ====================
-function checkBackendConnection() {
-    fetch(API_ENDPOINTS.health, {
-        method: 'GET',
-        headers: { 'Content-Type': 'application/json' }
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (API_CONFIG.DEBUG) {
-            console.log('✅ Backend connected:', data);
-        }
-    })
-    .catch(error => {
-        console.warn('⚠️ Backend not available. Running in offline mode.');
-        console.warn('API Base URL:', API_CONFIG.BASE_URL);
-    });
+function setMinDate() {
+    const dateInput = document.getElementById('date');
+    if (!dateInput) return;
+    const today = new Date().toISOString().split('T')[0];
+    dateInput.setAttribute('min', today);
 }
-// ==================== LOAD SERVICES ====================
-function loadServices() {
-    const serviceSelect = document.getElementById('service');
-    if (!serviceSelect) return;
 
-    console.log('Loading services from:', API_ENDPOINTS.services + '?limit=100');
-
-    // Fetch all services by requesting with a high limit
-    fetch(API_ENDPOINTS.services + '?limit=100', {
-        method: 'GET',
-        headers: { 'Content-Type': 'application/json' }
-    })
-    .then(response => {
-        console.log('Services response status:', response.status);
-        if (!response.ok) {
-            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+function formatPhoneNumber(inputId) {
+    const phoneInput = document.getElementById(inputId);
+    if (!phoneInput) return;
+    phoneInput.addEventListener('input', function() {
+        let val = this.value.replace(/\D/g,'');
+        if (val.length>0){
+            if (val.length<=3) val=val;
+            else if(val.length<=6) val=val.slice(0,3)+' '+val.slice(3);
+            else if(val.length<=9) val=val.slice(0,3)+' '+val.slice(3,6)+' '+val.slice(6);
+            else val='+'+val.slice(0,3)+' '+val.slice(3,6)+' '+val.slice(6,9)+' '+val.slice(9,12);
         }
-        return response.json();
-    })
-    .then(data => {
-        console.log('Services data received:', data);
-        // Handle paginated response
-        let allServices = data.results || (Array.isArray(data) ? data : []);
-
-        // If there are more pages, fetch them recursively
-        if (data.next) {
-            const fetchNextPage = (nextUrl) => {
-                return fetch(nextUrl)
-                    .then(r => r.json())
-                    .then(pageData => {
-                        allServices = allServices.concat(pageData.results || []);
-                        if (pageData.next) {
-                            return fetchNextPage(pageData.next);
-                        }
-                        return allServices;
-                    });
-            };
-            return fetchNextPage(data.next);
-        }
-        return allServices;
-    })
-    .then(services => {
-        console.log('All services:', services);
-        // Group services by category
-        const grouped = {};
-        services.forEach(service => {
-            if (!grouped[service.category]) {
-                grouped[service.category] = [];
-            }
-            grouped[service.category].push(service);
-        });
-
-        // Clear existing options except the first one
-        serviceSelect.innerHTML = '<option value="">-- Choose Service --</option>';
-
-        // Add grouped options
-        Object.keys(grouped).sort().forEach(category => {
-            const optgroup = document.createElement('optgroup');
-            optgroup.label = category.charAt(0).toUpperCase() + category.slice(1) + ' Services';
-
-            grouped[category].forEach(service => {
-                const option = document.createElement('option');
-                option.value = service.id;
-                option.textContent = `${service.name} – KES ${service.price}`;
-                optgroup.appendChild(option);
-            });
-
-            serviceSelect.appendChild(optgroup);
-        });
-
-        console.log('Services loaded successfully');
-    })
-    .catch(error => {
-        console.error('Error loading services:', error);
-        serviceSelect.innerHTML = '<option value="">Error loading services</option>';
+        this.value=val;
     });
 }
 
-// ==================== SMOOTH SCROLL ====================
-document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-    anchor.addEventListener('click', function(e) {
-        const href = this.getAttribute('href');
-        if (href !== '#') {
-            e.preventDefault();
-            const element = document.querySelector(href);
-            if (element) {
-                element.scrollIntoView({ behavior: 'smooth' });
-            }
-        }
-    });
-});
-
-// ==================== ACTIVE NAVIGATION LINK ====================
-window.addEventListener('load', function() {
-    const currentPage = window.location.pathname.split('/').pop() || 'index.html';
-    const navLinks = document.querySelectorAll('.nav-links a');
-    
-    navLinks.forEach(link => {
-        const href = link.getAttribute('href');
-        if (href === currentPage || (currentPage === '' && href === 'index.html')) {
-            link.classList.add('active');
-        } else {
-            link.classList.remove('active');
-        }
-    });
-});
-
-// ==================== FORMAT PHONE NUMBER ====================
-function formatPhoneNumber(input) {
-    const phoneInput = document.getElementById(input);
-    if (phoneInput) {
-        phoneInput.addEventListener('input', function() {
-            // Remove non-digits
-            let value = this.value.replace(/\D/g, '');
-            
-            // Format as you type (basic Kenyan format)
-            if (value.length > 0) {
-                if (value.length <= 3) {
-                    value = value;
-                } else if (value.length <= 6) {
-                    value = value.slice(0, 3) + ' ' + value.slice(3);
-                } else if (value.length <= 9) {
-                    value = value.slice(0, 3) + ' ' + value.slice(3, 6) + ' ' + value.slice(6);
-                } else {
-                    value = '+' + value.slice(0, 3) + ' ' + value.slice(3, 6) + ' ' + value.slice(6, 9) + ' ' + value.slice(9, 12);
-                }
-            }
-            this.value = value;
-        });
-    }
-}
-
-formatPhoneNumber('phone');
-
-// ==================== TIME PICKER VALIDATION ====================
 function validateTimeSlot() {
     const timeInput = document.getElementById('time');
-    if (timeInput) {
-        timeInput.addEventListener('change', function() {
-            const selectedTime = this.value;
-            const [hours] = selectedTime.split(':');
-            const hour = parseInt(hours);
-
-            // Salon hours: 9 AM - 8 PM (09:00 - 20:00)
-            if (hour < 9 || hour >= 20) {
-                alert('Please select a time between 9:00 AM and 8:00 PM');
-                this.value = '';
-            }
-        });
-    }
+    if (!timeInput) return;
+    timeInput.addEventListener('change', function() {
+        const hour = parseInt(this.value.split(':')[0]);
+        if(hour<9||hour>=20){ alert('Select time 9:00-20:00'); this.value=''; }
+    });
 }
 
-validateTimeSlot();
-
-// ==================== FORM AUTOSAVE ====================
 function autoSaveForm() {
     const form = document.getElementById('bookingForm');
-    if (form) {
-        const inputs = form.querySelectorAll('input, select, textarea');
-        const STORAGE_KEY = 'bookingFormData';
-
-        // Load saved data
-        const savedData = localStorage.getItem(STORAGE_KEY);
-        if (savedData) {
-            const data = JSON.parse(savedData);
-            for (const [key, value] of Object.entries(data)) {
-                const field = form.querySelector(`[name="${key}"]`);
-                if (field) {
-                    field.value = value;
-                }
-            }
-        }
-
-        // Save data on input
-        inputs.forEach(input => {
-            input.addEventListener('input', function() {
-                const formData = new FormData(form);
-                const data = Object.fromEntries(formData);
-                localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
-            });
-        });
-    }
+    if(!form) return;
+    const inputs = form.querySelectorAll('input, select, textarea');
+    const STORAGE_KEY='bookingFormData';
+    const saved = localStorage.getItem(STORAGE_KEY);
+    if(saved) Object.entries(JSON.parse(saved)).forEach(([k,v])=>{ const f=form.querySelector(`[name="${k}"]`); if(f) f.value=v; });
+    inputs.forEach(input => input.addEventListener('input',()=>{ const data=Object.fromEntries(new FormData(form)); localStorage.setItem(STORAGE_KEY, JSON.stringify(data)); }));
 }
 
-// Call autosave on page load
-if (document.getElementById('bookingForm')) {
-    autoSaveForm();
+function setupSmoothScroll() {
+    document.querySelectorAll('a[href^="#"]').forEach(a=>a.addEventListener('click',function(e){
+        const href=this.getAttribute('href'); 
+        if(href!=='#'){e.preventDefault(); const el=document.querySelector(href); if(el) el.scrollIntoView({behavior:'smooth'});}
+    }));
 }
 
-// ==================== ANALYTICS TRACKING ====================
-function trackEvent(eventName, eventData = {}) {
-    // Simple analytics tracking - you can integrate with Google Analytics
-    if (API_CONFIG.DEBUG) {
-        console.log(`Event: ${eventName}`, eventData);
-    }
+function highlightActiveNav() {
+    const currentPage = window.location.pathname.split('/').pop() || 'index.html';
+    document.querySelectorAll('.nav-links a').forEach(link=>{
+        const href=link.getAttribute('href');
+        if(href===currentPage || (currentPage===''&&href==='index.html')) link.classList.add('active');
+        else link.classList.remove('active');
+    });
 }

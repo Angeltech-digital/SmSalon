@@ -842,8 +842,8 @@
 
     <script src="script.js"></script>
     <script>
-        // Use API_CONFIG from script.js, with fallback for local development
-        const API_BASE_URL = window.API_CONFIG ? window.API_CONFIG.BASE_URL : 'https://plankton-app-q4rym.ondigitalocean.app/api';
+        // Use API_CONFIG from script.js instead of duplicate declaration
+        const API_BASE_URL = API_CONFIG.BASE_URL;
         let accessToken = localStorage.getItem('access_token');
 
         // Check authentication
