@@ -9,6 +9,7 @@ DEBUG = False
 
 ALLOWED_HOSTS = [
     "smsalon-ehqso.ondigitalocean.app",
+    "smsalonandbarbershop-px697.ondigitalocean.app",
     "localhost",
     "127.0.0.1",
 ]
@@ -118,24 +119,58 @@ SIMPLE_JWT = {
 }
 
 # ---------------------------
-# CORS (allow all for local dev)
+# CORS Configuration
 # ---------------------------
-CORS_ALLOW_ALL_ORIGINS = False
+# Allow all origins for development (set to False in production)
+CORS_ALLOW_ALL_ORIGINS = True
 
 CORS_ALLOWED_ORIGINS = [
     "https://smsalon-ehqso.ondigitalocean.app",
+    "https://smsalonandbarbershop-px697.ondigitalocean.app",
     "http://0.0.0.0:8001",
     "http://localhost:8001",
     "http://127.0.0.1:8001"
 ]
 
+# Cache OPTIONS requests for 1 hour to reduce preflight overhead
+CORS_PREFLIGHT_MAX_AGE = 3600
+
+CORS_ALLOWED_ORIGIN_REGEXES = [
+    r"^https://.*\.ondigitalocean\.app$",
+]
+
+CORS_ALLOW_METHODS = [
+    "GET",
+    "POST",
+    "PUT",
+    "PATCH",
+    "DELETE",
+    "OPTIONS",
+]
+
+CORS_ALLOW_HEADERS = [
+    "accept",
+    "accept-encoding",
+    "authorization",
+    "content-type",
+    "dnt",
+    "origin",
+    "user-agent",
+    "x-csrftoken",
+    "x-requested-with",
+]
+
+CORS_EXPOSE_HEADERS = [
+    "content-type",
+    "authorization",
+]
+
 CSRF_TRUSTED_ORIGINS = [
     "https://smsalon-ehqso.ondigitalocean.app",
+    "https://smsalonandbarbershop-px697.ondigitalocean.app",
     "http://0.0.0.0:8001",
     "http://localhost:8001",
     "http://127.0.0.1:8001"
-
-
 ]
 
 CORS_ALLOW_CREDENTIALS = True

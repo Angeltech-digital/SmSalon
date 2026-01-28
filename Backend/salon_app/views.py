@@ -8,12 +8,8 @@ from django.contrib.auth import authenticate
 from django.contrib.auth.models import User
 from django.db.models import Q
 from django.utils import timezone
-# from django.http import JsonResponse
-# from rest_framework.response import Response
-# from rest_framework.decorators import api_view
-
-
-
+from django.urls import path, include
+from rest_framework.routers import DefaultRouter
 
 from .models import Service, Stylist, Booking, ContactMessage, Review, SalonSettings
 from .serializers import (
@@ -200,9 +196,7 @@ class BookingViewSet(viewsets.ModelViewSet):
 
 # ==================== CONTACT MESSAGE VIEWSET ====================
 class ContactMessageViewSet(viewsets.ModelViewSet):
-    """from rest_framework.response import Response
-from rest_framework.decorators import api_view
-
+    """
     Manage contact messages.
     
     POST /api/contacts/ - Send contact message
@@ -257,18 +251,11 @@ class SalonSettingsViewSet(viewsets.ReadOnlyModelViewSet):
 
 
 # ==================== UTILITY ENDPOINTS ====================
-from rest_framework.decorators import api_view, permission_classes
-health
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def health_check(request):
     """Health check endpoint"""
     return Response({'status': 'ok', 'message': 'Salon API is running'})
-
-
-
-
-from django.utils import timezone
 
 
 # ==================== AUTHENTICATION VIEWSET ====================
@@ -471,3 +458,22 @@ class UserProfileView(APIView):
                 'last_name': user.last_name,
             }
         })
+
+
+# ==================== URL Configuration ====================
+# DRF Router
+router = DefaultRouter()
+router.register(r'services', ServiceViewSet, basename='service')
+router.register(r'stylists', StylistViewSet, basename='stylist')
+router.register(r'bookings', BookingViewSet, basename='booking')
+router.register(r'contacts', ContactMessageViewSet, basename='contact')
+router.register(r'reviews', ReviewViewSet, basename='review')
+router.register(r'settings', SalonSettingsViewSet, basename='settings')
+
+# URL Patterns
+urlpatterns = [
+    path('', include(router.urls)),
+    path('health/', health_check, name='health-check'),
+    path('auth/login/', LoginView.as_view(), name='login'),
+]
+
