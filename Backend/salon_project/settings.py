@@ -4,10 +4,14 @@ from datetime import timedelta
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-SECRET_KEY = 'django-insecure-change-this-in-local-dev'
-DEBUG = True
-ALLOWED_HOSTS = ['localhost', '127.0.0.1']
+SECRET_KEY = os.environ.get("SECRET_KEY", "unsafe-dev-key")
+DEBUG = False
 
+ALLOWED_HOSTS = [
+    "smsalon-ehqso.ondigitalocean.app",
+    "localhost",
+    "127.0.0.1",
+]
 # ---------------------------
 # Apps
 # ---------------------------
@@ -100,11 +104,12 @@ MEDIA_ROOT = BASE_DIR / 'media'
 # REST Framework & JWT
 # ---------------------------
 REST_FRAMEWORK = {
-    'DEFAULT_AUTHENTICATION_CLASSES': [
-        'rest_framework_simplejwt.authentication.JWTAuthentication',
-        'rest_framework.authentication.SessionAuthentication',
-    ],
-    'DEFAULT_PERMISSION_CLASSES': ['rest_framework.permissions.AllowAny'],
+    "DEFAULT_AUTHENTICATION_CLASSES": (
+        "rest_framework_simplejwt.authentication.JWTAuthentication",
+    ),
+    "DEFAULT_PERMISSION_CLASSES": (
+        "rest_framework.permissions.AllowAny",
+    ),
 }
 
 SIMPLE_JWT = {
@@ -115,5 +120,14 @@ SIMPLE_JWT = {
 # ---------------------------
 # CORS (allow all for local dev)
 # ---------------------------
-CORS_ALLOW_ALL_ORIGINS = True
+CORS_ALLOW_ALL_ORIGINS = False
+
+CORS_ALLOWED_ORIGINS = [
+    "https://smsalon-ehqso.ondigitalocean.app",
+]
+
+CSRF_TRUSTED_ORIGINS = [
+    "https://smsalon-ehqso.ondigitalocean.app",
+]
+
 CORS_ALLOW_CREDENTIALS = True
