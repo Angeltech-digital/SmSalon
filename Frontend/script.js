@@ -32,7 +32,8 @@ document.addEventListener("DOMContentLoaded", () => {
     setupMobileMenu();
     checkBackendConnection();
     loadServices();
-    setupBookingForm();
+    
+    // setupBookingForm();
     setupContactForm();
     setMinDate();
     formatPhoneNumber("phone");

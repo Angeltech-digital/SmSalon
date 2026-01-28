@@ -8,6 +8,13 @@ from django.contrib.auth import authenticate
 from django.contrib.auth.models import User
 from django.db.models import Q
 from django.utils import timezone
+# from django.http import JsonResponse
+# from rest_framework.response import Response
+# from rest_framework.decorators import api_view
+
+
+
+
 from .models import Service, Stylist, Booking, ContactMessage, Review, SalonSettings
 from .serializers import (
     ServiceSerializer, StylistSerializer, BookingCreateSerializer,
@@ -193,7 +200,9 @@ class BookingViewSet(viewsets.ModelViewSet):
 
 # ==================== CONTACT MESSAGE VIEWSET ====================
 class ContactMessageViewSet(viewsets.ModelViewSet):
-    """
+    """from rest_framework.response import Response
+from rest_framework.decorators import api_view
+
     Manage contact messages.
     
     POST /api/contacts/ - Send contact message
@@ -249,12 +258,14 @@ class SalonSettingsViewSet(viewsets.ReadOnlyModelViewSet):
 
 # ==================== UTILITY ENDPOINTS ====================
 from rest_framework.decorators import api_view, permission_classes
-
+health
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def health_check(request):
     """Health check endpoint"""
     return Response({'status': 'ok', 'message': 'Salon API is running'})
+
+
 
 
 from django.utils import timezone
