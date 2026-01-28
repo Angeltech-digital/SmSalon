@@ -124,10 +124,15 @@ CORS_ALLOW_ALL_ORIGINS = False
 
 CORS_ALLOWED_ORIGINS = [
     "https://smsalon-ehqso.ondigitalocean.app",
+    "http://0.0.0.0:8001",
+    "http://localhost:8001",
 ]
 
 CSRF_TRUSTED_ORIGINS = [
     "https://smsalon-ehqso.ondigitalocean.app",
+    "http://0.0.0.0:8001",
+    "http://localhost:8001",
 ]
 
 CORS_ALLOW_CREDENTIALS = True
+
