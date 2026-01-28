@@ -1,5 +1,24 @@
 // ==================== API CONFIGURATION ====================
-const BASE_URL = "https://smsalon-ehqso.ondigitalocean.app/api";
+// Auto-detect backend URL based on current deployment
+const getBackendUrl = () => {
+    const currentHost = window.location.hostname;
+    
+    // If frontend is on smsalonandbarbershop domain, use backend on smsalon-ehqso
+    if (currentHost.includes('smsalonandbarbershop')) {
+        return "https://smsalon-ehqso.ondigitalocean.app/api";
+    }
+    
+    // If on same domain, use relative path (works for local dev and same-host deployment)
+    if (currentHost === 'localhost' || currentHost === '127.0.0.1') {
+        return "http://localhost:8000/api";
+    }
+    
+    // Default: use same hostname for backend (if deployed on same domain)
+    const protocol = window.location.protocol;
+    return `${protocol}//${currentHost}/api`;
+};
+
+const BASE_URL = getBackendUrl();
 
 const API_CONFIG = {
     BASE_URL,
