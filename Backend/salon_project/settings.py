@@ -73,13 +73,51 @@ WSGI_APPLICATION = 'salon_project.wsgi.application'
 # DATABASE (PostgreSQL for Production, SQLite for Dev)
 # ---------------------------
 # Support for DATABASE_URL environment variable (used by DigitalOcean, Heroku, etc.)
-db_from_env = dj_database_url.config(conn_max_age=600, ssl_require=True)
 
 # Check if DATABASE_URL is set (production)
 if os.environ.get('DATABASE_URL'):
-    DATABASES = {
-        'default': db_from_env
-    }
+    # Parse the DATABASE_URL manually to ensure SSL is properly configured
+    import re
+    database_url = os.environ.get('DATABASE_URL')
+    
+    # Check if it's a PostgreSQL URL
+    if database_url.startswith('postgresql://') or database_url.startswith('postgres://'):
+        # Parse the URL
+        pattern = r'postgresql(?:s)?://([^:]+):([^@]+)@([^:]+):(\d+)/(.+)'
+        match = re.match(pattern, database_url)
+        
+        if match:
+            user = match.group(1)
+            password = match.group(2)
+            host = match.group(3)
+            port = match.group(4)
+            name = match.group(5).split('?')[0]  # Remove query params if any
+            
+            DATABASES = {
+                'default': {
+                    'ENGINE': 'django.db.backends.postgresql',
+                    'NAME': name,
+                    'USER': user,
+                    'PASSWORD': password,
+                    'HOST': host,
+                    'PORT': port,
+                    'OPTIONS': {
+                        'sslmode': 'require',
+                    },
+                }
+            }
+        else:
+            # Fallback to dj-database-url
+            db_from_env = dj_database_url.config(conn_max_age=600, ssl_require=True)
+            DATABASES = {
+                'default': db_from_env
+            }
+    else:
+        # Use dj-database-url for other databases
+        db_from_env = dj_database_url.config(conn_max_age=600, ssl_require=True)
+        DATABASES = {
+            'default': db_from_env
+        }
 else:
     # Fallback to SQLite for local development
     DATABASES = {
