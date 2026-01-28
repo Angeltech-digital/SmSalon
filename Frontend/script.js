@@ -34,7 +34,7 @@ document.addEventListener("DOMContentLoaded", () => {
     loadServices();
     
     // setupBookingForm();
-    setupContactForm();
+    // setupContactForm();
     setMinDate();
     formatPhoneNumber("phone");
     validateTimeSlot();
