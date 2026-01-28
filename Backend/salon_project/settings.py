@@ -1,6 +1,7 @@
 import os
 from pathlib import Path
 from datetime import timedelta
+import dj_database_url
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -69,14 +70,18 @@ TEMPLATES = [
 WSGI_APPLICATION = 'salon_project.wsgi.application'
 
 # ---------------------------
-# Database (SQLite for local dev)
+# Database (PostgreSQL on production, SQLite for local dev)
 # ---------------------------
+db_from_env = dj_database_url.config(conn_max_age=500, ssl_require=True)
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
+# Override with PostgreSQL if DATABASE_URL is set (DigitalOcean)
+if os.environ.get('DATABASE_URL'):
+    DATABASES['default'] = dj_database_url.config(conn_max_age=500, ssl_require=True)
 
 # ---------------------------
 # Password validators
