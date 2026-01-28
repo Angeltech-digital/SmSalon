@@ -95,6 +95,43 @@ async function loadServices() {
     }
 }
 
+// ==================== DISPLAY SERVICES ====================
+function displayServices(services) {
+    const serviceSelect = document.getElementById("service");
+    if (!serviceSelect) return;
+
+    // Clear existing options except the first placeholder
+    serviceSelect.innerHTML = '<option value="">-- Select a Service --</option>';
+
+    if (!services || services.length === 0) {
+        serviceSelect.innerHTML = '<option value="">No services available</option>';
+        return;
+    }
+
+    services.forEach(service => {
+        const option = document.createElement("option");
+        option.value = service.id;
+        option.textContent = `${service.name} - KSh ${service.price}`;
+        option.dataset.price = service.price || 0;
+        option.dataset.duration = service.duration || 30;
+        serviceSelect.appendChild(option);
+    });
+}
+
+// ==================== OFFLINE SERVICES DATA ====================
+function getOfflineServices() {
+    return [
+        { id: 1, name: "Haircut", price: 500, duration: 30 },
+        { id: 2, name: "Beard Trim", price: 300, duration: 15 },
+        { id: 3, name: "Full Shave", price: 400, duration: 30 },
+        { id: 4, name: "Hair Coloring", price: 1500, duration: 120 },
+        { id: 5, name: "Kids Haircut", price: 350, duration: 20 },
+        { id: 6, name: "Hair Treatment", price: 800, duration: 45 },
+        { id: 7, name: "Scalp Massage", price: 600, duration: 30 },
+        { id: 8, name: "Waxing", price: 700, duration: 45 }
+    ];
+}
+
 // ==================== BOOKING SUBMIT ====================
 async function submitBooking(data) {
     if (window.IS_OFFLINE) {
