@@ -840,8 +840,10 @@
         </div>
     </div>
 
+    <script src="script.js"></script>
     <script>
-        const API_BASE_URL = 'http://localhost:8000/api';
+        // Use API_CONFIG from script.js, with fallback for local development
+        const API_BASE_URL = window.API_CONFIG ? window.API_CONFIG.BASE_URL : 'https://plankton-app-q4rym.ondigitalocean.app/api';
         let accessToken = localStorage.getItem('access_token');
 
         // Check authentication
