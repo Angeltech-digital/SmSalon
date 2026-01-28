@@ -2,6 +2,7 @@ import os
 from pathlib import Path
 from decouple import config, Csv
 from datetime import timedelta
+import dj_database_url  # For DATABASE_URL support
 
 # ---------------------------
 # BASE SETTINGS
@@ -69,18 +70,24 @@ TEMPLATES = [
 WSGI_APPLICATION = 'salon_project.wsgi.application'
 
 # ---------------------------
-# DATABASE (SQLite for Dev / Configure Postgres for Prod)
+# DATABASE (PostgreSQL for Production, SQLite for Dev)
 # ---------------------------
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
-}
+# Support for DATABASE_URL environment variable (used by DigitalOcean, Heroku, etc.)
+db_from_env = dj_database_url.config(conn_max_age=600, ssl_require=True)
 
-# Example Postgres config for Heroku:
-# import dj_database_url
-# DATABASES['default'] = dj_database_url.config(conn_max_age=600, ssl_require=True)
+# Check if DATABASE_URL is set (production)
+if os.environ.get('DATABASE_URL'):
+    DATABASES = {
+        'default': db_from_env
+    }
+else:
+    # Fallback to SQLite for local development
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
+        }
+    }
 
 # ---------------------------
 # PASSWORD VALIDATION
