@@ -339,6 +339,26 @@ body {
     padding: 60px 20px;
 }
 
+/* ==================== SERVICES GALLERY ==================== */
+.services-gallery {
+    padding: 60px 20px;
+    background-color: var(--light-color);
+}
+
+.services-gallery h2 {
+    text-align: center;
+    font-size: 2.5rem;
+    margin-bottom: 0.5rem;
+    color: var(--text-dark);
+}
+
+.services-gallery .gallery-intro {
+    text-align: center;
+    color: var(--text-light);
+    font-size: 1.1rem;
+    margin-bottom: 3rem;
+}
+
 .services-list {
     margin-bottom: 3rem;
 }
