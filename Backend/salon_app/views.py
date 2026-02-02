@@ -267,6 +267,9 @@ class SignupView(APIView):
     permission_classes = [AllowAny]
     
     def post(self, request):
+        import logging
+        logger = logging.getLogger(__name__)
+        
         username = request.data.get('username')
         email = request.data.get('email')
         password = request.data.get('password')
@@ -274,20 +277,26 @@ class SignupView(APIView):
         first_name = request.data.get('first_name', '')
         last_name = request.data.get('last_name', '')
         
+        # Log the signup attempt (without password)
+        logger.info(f"Signup attempt for user: {username}, email: {email}")
+        
         # Validation
         if not all([username, email, password, password_confirm]):
+            logger.warning(f"Signup validation failed: missing fields for {username}")
             return Response(
                 {'error': 'All fields are required'},
                 status=status.HTTP_400_BAD_REQUEST
             )
         
         if password != password_confirm:
+            logger.warning(f"Signup validation failed: passwords don't match for {username}")
             return Response(
                 {'error': 'Passwords do not match'},
                 status=status.HTTP_400_BAD_REQUEST
             )
         
         if len(password) < 6:
+            logger.warning(f"Signup validation failed: password too short for {username}")
             return Response(
                 {'error': 'Password must be at least 6 characters'},
                 status=status.HTTP_400_BAD_REQUEST
@@ -295,12 +304,14 @@ class SignupView(APIView):
         
         # Check if user already exists
         if User.objects.filter(username=username).exists():
+            logger.warning(f"Signup validation failed: username exists: {username}")
             return Response(
                 {'error': 'Username already exists'},
                 status=status.HTTP_400_BAD_REQUEST
             )
         
         if User.objects.filter(email=email).exists():
+            logger.warning(f"Signup validation failed: email exists: {email}")
             return Response(
                 {'error': 'Email already exists'},
                 status=status.HTTP_400_BAD_REQUEST
@@ -308,6 +319,7 @@ class SignupView(APIView):
         
         # Create user
         try:
+            logger.info(f"Creating user: {username}")
             user = User.objects.create_user(
                 username=username,
                 email=email,
@@ -315,9 +327,26 @@ class SignupView(APIView):
                 first_name=first_name,
                 last_name=last_name
             )
+            logger.info(f"User created successfully: {username}, id={user.id}")
             
             # Generate tokens
-            refresh = RefreshToken.for_user(user)
+            try:
+                refresh = RefreshToken.for_user(user)
+                logger.info(f"Tokens generated for user: {username}")
+            except Exception as token_error:
+                logger.error(f"Token generation failed for user {username}: {str(token_error)}")
+                # Still return success even if token generation fails
+                return Response({
+                    'message': 'User created successfully (token generation failed)',
+                    'user': {
+                        'id': user.id,
+                        'username': user.username,
+                        'email': user.email,
+                        'first_name': user.first_name,
+                        'last_name': user.last_name,
+                    },
+                    'error': 'Token generation failed. Please login separately.',
+                }, status=status.HTTP_201_CREATED)
             
             return Response({
                 'message': 'User created successfully',
@@ -333,8 +362,9 @@ class SignupView(APIView):
             }, status=status.HTTP_201_CREATED)
         
         except Exception as e:
+            logger.exception(f"Signup failed for user {username}: {str(e)}")
             return Response(
-                {'error': str(e)},
+                {'error': f'Signup failed: {str(e)}'},
                 status=status.HTTP_400_BAD_REQUEST
             )
 
