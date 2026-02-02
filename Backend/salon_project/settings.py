@@ -183,6 +183,8 @@ CORS_ALLOW_CREDENTIALS = True
 # ---------------------------
 # Logging Configuration
 # ---------------------------
+# File logging only used in DEBUG mode (local development)
+# Production uses console-only logging to avoid file permission issues
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
@@ -201,11 +203,6 @@ LOGGING = {
             'class': 'logging.StreamHandler',
             'formatter': 'simple',
         },
-        'file': {
-            'class': 'logging.FileHandler',
-            'filename': BASE_DIR / 'logs' / 'debug.log',
-            'formatter': 'verbose',
-        },
     },
     'root': {
         'handlers': ['console'],
@@ -213,10 +210,27 @@ LOGGING = {
     },
     'loggers': {
         'salon_app': {
-            'handlers': ['console', 'file'],
+            'handlers': ['console'],
             'level': 'DEBUG',
             'propagate': False,
         },
     },
 }
+
+# Add file handler only in DEBUG mode (local development)
+if DEBUG:
+    # Ensure logs directory exists for local development
+    import os
+    logs_dir = BASE_DIR / 'logs'
+    if not os.path.exists(logs_dir):
+        os.makedirs(logs_dir, exist_ok=True)
+    
+    # Add file handler to existing configuration
+    LOGGING['handlers']['file'] = {
+        'class': 'logging.FileHandler',
+        'filename': logs_dir / 'debug.log',
+        'formatter': 'verbose',
+    }
+    LOGGING['root']['handlers'].append('file')
+    LOGGING['loggers']['salon_app']['handlers'].append('file')
 
