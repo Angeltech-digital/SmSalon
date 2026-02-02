@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Login - SM BARBERSHOP SALON AND SPA Management</title>
+    <title>Customer Login - SM BARBERSHOP SALON AND SPA</title>
     <link rel="stylesheet" href="styles.css">
     <style>
         .auth-container {
@@ -11,7 +11,8 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            background: linear-gradient(135deg, #c89b3c 0%, #b18933 100%);
+            background: linear-gradient(135deg, #1a5f7a 0%, #159895 100%);
+            padding: 20px;
         }
 
         .auth-card {
@@ -61,14 +62,14 @@
 
         .form-group input:focus {
             outline: none;
-            border-color: #c89b3c;
-            box-shadow: 0 0 0 3px rgba(200, 155, 60, 0.1);
+            border-color: #159895;
+            box-shadow: 0 0 0 3px rgba(21, 152, 149, 0.1);
         }
 
         .btn-login {
             width: 100%;
             padding: 12px;
-            background: linear-gradient(135deg, #c89b3c 0%, #b18933 100%);
+            background: linear-gradient(135deg, #1a5f7a 0%, #159895 100%);
             color: white;
             border: none;
             border-radius: 5px;
@@ -80,7 +81,7 @@
 
         .btn-login:hover {
             transform: translateY(-2px);
-            box-shadow: 0 5px 20px rgba(200, 155, 60, 0.4);
+            box-shadow: 0 5px 20px rgba(21, 152, 149, 0.4);
         }
 
         .btn-login:active {
@@ -94,7 +95,7 @@
         }
 
         .error-message {
-            color: #c89b3c;
+            color: #dc3545;
             background: #f8d7da;
             border: 1px solid #f5c6cb;
             padding: 12px;
@@ -131,7 +132,7 @@
         }
 
         .auth-footer a {
-            color: #c89b3c;
+            color: #159895;
             text-decoration: none;
             font-weight: 600;
         }
@@ -143,7 +144,7 @@
         .loading {
             display: none;
             text-align: center;
-            color: #c89b3c;
+            color: #159895;
             font-size: 14px;
         }
 
@@ -155,7 +156,7 @@
             display: inline-block;
             width: 16px;
             height: 16px;
-            border: 2px solid #c89b3c;
+            border: 2px solid #159895;
             border-top-color: transparent;
             border-radius: 50%;
             animation: spin 0.6s linear infinite;
@@ -170,7 +171,7 @@
         .back-button {
             display: inline-block;
             margin-bottom: 20px;
-            color: #c89b3c;
+            color: #159895;
             text-decoration: none;
             font-size: 14px;
             font-weight: 600;
@@ -179,14 +180,56 @@
         .back-button:hover {
             text-decoration: underline;
         }
+
+        .login-options {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .login-option {
+            flex: 1;
+            padding: 12px;
+            text-align: center;
+            border-radius: 5px;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+
+        .login-option.customer {
+            background: #e8f4f4;
+            color: #159895;
+            border: 2px solid #159895;
+        }
+
+        .login-option.admin {
+            background: transparent;
+            color: #666;
+            border: 2px solid #ddd;
+        }
+
+        .login-option:hover {
+            transform: translateY(-2px);
+        }
+
+        .login-option.active {
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
     </style>
 </head>
 <body>
     <div class="auth-container">
         <div class="auth-card">
             <a href="index.html" class="back-button">← Back to Home</a>
-            <h2>Admin Login</h2>
-            <p>Access the SM BARBERSHOP SALON AND SPA management system</p>
+            <h2>Customer Login</h2>
+            <p>Access your bookings and appointments</p>
+
+            <div class="login-options">
+                <a href="customer-login.html" class="login-option customer active">Customer</a>
+                <a href="login.html" class="login-option admin">Admin</a>
+            </div>
 
             <div class="error-message" id="errorMessage"></div>
             <div class="success-message" id="successMessage"></div>
@@ -216,7 +259,7 @@
 
                 <button type="submit" class="btn-login" id="loginBtn">
                     <span class="spinner" style="display: none;"></span>
-                    Login to Admin Panel
+                    Login to My Account
                 </button>
             </form>
 
@@ -261,8 +304,8 @@
             document.getElementById('loading').classList.add('show');
 
             try {
-                // Use admin-specific login endpoint
-                const response = await fetch(`${API_BASE_URL}/auth/admin/login/`, {
+                // Use customer-specific login endpoint
+                const response = await fetch(`${API_BASE_URL}/auth/customer/login/`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -287,12 +330,12 @@
                 localStorage.setItem('access_token', data.access);
                 localStorage.setItem('refresh_token', data.refresh);
                 localStorage.setItem('user', JSON.stringify(data.user));
-                localStorage.setItem('user_type', 'admin');
+                localStorage.setItem('user_type', 'customer');
 
-                showSuccess('Login successful! Redirecting to admin panel...');
+                showSuccess('Login successful! Redirecting to your dashboard...');
                 
                 setTimeout(() => {
-                    window.location.href = 'admin-dashboard.html';
+                    window.location.href = 'customer-dashboard.html';
                 }, 1500);
 
             } catch (error) {
@@ -316,17 +359,17 @@
             successDiv.classList.add('show');
         }
 
-        // Check if already logged in as admin
+        // Check if already logged in as customer
         window.addEventListener('load', () => {
             const token = localStorage.getItem('access_token');
             const user = JSON.parse(localStorage.getItem('user') || '{}');
             
             if (token) {
                 // If already logged in, redirect to appropriate dashboard
-                if (user.user_type === 'customer' && !user.is_staff) {
-                    window.location.href = 'customer-dashboard.html';
-                } else {
+                if (user.user_type === 'admin' || user.is_staff) {
                     window.location.href = 'admin-dashboard.html';
+                } else {
+                    window.location.href = 'customer-dashboard.html';
                 }
             }
         });

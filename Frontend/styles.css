@@ -90,6 +90,77 @@ body {
     transition: 0.3s;
 }
 
+/* Dropdown Menu */
+.dropdown {
+    position: relative;
+}
+
+.dropdown-content {
+    display: none;
+    position: absolute;
+    background-color: #fff;
+    min-width: 160px;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+    border-radius: 8px;
+    z-index: 1000;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    margin-top: 0.5rem;
+}
+
+.dropdown-content::before {
+    content: '';
+    position: absolute;
+    top: -8px;
+    left: 50%;
+    transform: translateX(-50%);
+    border-width: 0 8px 8px;
+    border-style: solid;
+    border-color: transparent transparent #fff transparent;
+}
+
+.dropdown:hover .dropdown-content,
+.dropdown:active .dropdown-content {
+    display: block;
+}
+
+.dropdown-content a {
+    color: var(--text-dark);
+    padding: 12px 16px;
+    text-decoration: none;
+    display: block;
+    font-size: 0.95rem;
+    transition: background-color 0.2s;
+}
+
+.dropdown-content a:hover {
+    background-color: var(--light-color);
+    color: var(--primary-color);
+    border-bottom: none !important;
+}
+
+.dropdown-content a:first-child {
+    border-radius: 8px 8px 0 0;
+}
+
+.dropdown-content a:last-child {
+    border-radius: 0 0 8px 8px;
+}
+
+/* Book link style */
+.book-link {
+    background-color: var(--primary-color);
+    color: #fff !important;
+    padding: 8px 16px;
+    border-radius: 6px;
+}
+
+.book-link:hover {
+    background-color: var(--secondary-color) !important;
+    border-bottom: none !important;
+}
+
 /* ==================== HERO SECTION ==================== */
 .hero {
     background: linear-gradient(135deg, rgba(200, 155, 60, 0.9) 0%, rgba(177, 137, 51, 0.9) 100%),

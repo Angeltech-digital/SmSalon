@@ -10,6 +10,8 @@ from .views import (
     SalonSettingsViewSet,
     health_check,
     LoginView,
+    CustomerLoginView,
+    AdminLoginView,
     SignupView,
     LogoutView,
     UserProfileView,
@@ -34,6 +36,8 @@ urlpatterns = [
     path('health/', health_check, name='health-check'),
     path('auth/signup/', SignupView.as_view(), name='signup'),
     path('auth/login/', LoginView.as_view(), name='login'),
+    path('auth/customer/login/', CustomerLoginView.as_view(), name='customer-login'),
+    path('auth/admin/login/', AdminLoginView.as_view(), name='admin-login'),
     path('auth/logout/', LogoutView.as_view(), name='logout'),
     path('auth/profile/', UserProfileView.as_view(), name='profile'),
 ]

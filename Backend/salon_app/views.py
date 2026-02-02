@@ -345,6 +345,7 @@ class LoginView(APIView):
     POST /api/auth/login/
 
     Required fields: username, password
+    Returns: user info including user_type (admin or customer)
     """
     permission_classes = [AllowAny]
 
@@ -387,6 +388,11 @@ class LoginView(APIView):
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
 
+        # Determine user type
+        # Admin: is_staff=True or is_superuser=True
+        # Customer: regular user with no staff status
+        user_type = 'admin' if (user.is_staff or user.is_superuser) else 'customer'
+
         return Response({
             'message': 'Login successful',
             'user': {
@@ -396,6 +402,152 @@ class LoginView(APIView):
                 'first_name': user.first_name,
                 'last_name': user.last_name,
                 'is_staff': user.is_staff,
+                'is_superuser': user.is_superuser,
+                'user_type': user_type,
+            },
+            'refresh': str(refresh),
+            'access': str(refresh.access_token),
+        }, status=status.HTTP_200_OK)
+
+
+class CustomerLoginView(APIView):
+    """
+    Customer login endpoint - for regular customers only.
+    POST /api/auth/customer/login/
+
+    Required fields: username, password
+    Returns error if trying to login as admin user
+    """
+    permission_classes = [AllowAny]
+
+    def post(self, request):
+        import logging
+        logger = logging.getLogger(__name__)
+
+        username = request.data.get('username')
+        password = request.data.get('password')
+
+        if not username or not password:
+            return Response(
+                {'error': 'Username and password are required'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        # Authenticate user
+        try:
+            user = authenticate(username=username, password=password)
+        except Exception as e:
+            logger.error(f"Authentication error for customer '{username}': {e}")
+            return Response(
+                {'error': 'Authentication failed. Please try again.'},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+
+        if user is None:
+            return Response(
+                {'error': 'Invalid username or password'},
+                status=status.HTTP_401_UNAUTHORIZED
+            )
+
+        # Check if user is an admin - reject admin users
+        if user.is_staff or user.is_superuser:
+            return Response(
+                {'error': 'This is an admin account. Please use the admin login page.'},
+                status=status.HTTP_403_FORBIDDEN
+            )
+
+        # Generate tokens
+        try:
+            refresh = RefreshToken.for_user(user)
+        except Exception as e:
+            logger.error(f"Token generation error for customer '{username}': {e}")
+            return Response(
+                {'error': 'Failed to generate authentication tokens.'},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+
+        return Response({
+            'message': 'Login successful',
+            'user': {
+                'id': user.id,
+                'username': user.username,
+                'email': user.email,
+                'first_name': user.first_name,
+                'last_name': user.last_name,
+                'user_type': 'customer',
+            },
+            'refresh': str(refresh),
+            'access': str(refresh.access_token),
+        }, status=status.HTTP_200_OK)
+
+
+class AdminLoginView(APIView):
+    """
+    Admin login endpoint - for staff/admin users only.
+    POST /api/auth/admin/login/
+
+    Required fields: username, password
+    Returns error if trying to login as regular customer
+    """
+    permission_classes = [AllowAny]
+
+    def post(self, request):
+        import logging
+        logger = logging.getLogger(__name__)
+
+        username = request.data.get('username')
+        password = request.data.get('password')
+
+        if not username or not password:
+            return Response(
+                {'error': 'Username and password are required'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        # Authenticate user
+        try:
+            user = authenticate(username=username, password=password)
+        except Exception as e:
+            logger.error(f"Authentication error for admin '{username}': {e}")
+            return Response(
+                {'error': 'Authentication failed. Please try again.'},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+
+        if user is None:
+            return Response(
+                {'error': 'Invalid username or password'},
+                status=status.HTTP_401_UNAUTHORIZED
+            )
+
+        # Check if user is an admin - reject non-admin users
+        if not user.is_staff and not user.is_superuser:
+            return Response(
+                {'error': 'This is a customer account. Please use the customer login page.'},
+                status=status.HTTP_403_FORBIDDEN
+            )
+
+        # Generate tokens
+        try:
+            refresh = RefreshToken.for_user(user)
+        except Exception as e:
+            logger.error(f"Token generation error for admin '{username}': {e}")
+            return Response(
+                {'error': 'Failed to generate authentication tokens.'},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+
+        return Response({
+            'message': 'Login successful',
+            'user': {
+                'id': user.id,
+                'username': user.username,
+                'email': user.email,
+                'first_name': user.first_name,
+                'last_name': user.last_name,
+                'is_staff': user.is_staff,
+                'is_superuser': user.is_superuser,
+                'user_type': 'admin',
             },
             'refresh': str(refresh),
             'access': str(refresh.access_token),

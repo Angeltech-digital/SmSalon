@@ -192,6 +192,36 @@
             text-decoration: underline;
         }
 
+        .account-type-selector {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .account-type-btn {
+            flex: 1;
+            padding: 12px;
+            border: 2px solid #ddd;
+            background: white;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            color: #666;
+            transition: all 0.3s;
+        }
+
+        .account-type-btn:hover {
+            border-color: #667eea;
+            color: #667eea;
+        }
+
+        .account-type-btn.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-color: transparent;
+        }
+
         .password-requirements {
             font-size: 12px;
             color: #666;
@@ -228,14 +258,26 @@
 <body>
     <div class="auth-container">
         <div class="auth-card">
-            <a href="index.html" class="back-button">← Back to Home</a>
-            <h2>Create Admin Account</h2>
-            <p>Register for salon management</p>
+        <a href="index.html" class="back-button">← Back to Home</a>
+            <h2>Create Account</h2>
+            <p>Register for salon access</p>
+
+            <!-- Account Type Selection -->
+            <div class="account-type-selector" style="display: flex; gap: 10px; margin-bottom: 20px;">
+                <button type="button" class="account-type-btn active" data-type="customer" onclick="selectAccountType('customer')">
+                    Customer
+                </button>
+                <button type="button" class="account-type-btn" data-type="admin" onclick="selectAccountType('admin')">
+                    Staff/Admin
+                </button>
+            </div>
 
             <div class="error-message" id="errorMessage"></div>
             <div class="success-message" id="successMessage"></div>
 
             <form id="signupForm">
+                <input type="hidden" id="accountType" value="customer">
+
                 <div class="form-group">
                     <label for="username">Username</label>
                     <input 
@@ -312,7 +354,7 @@
 
                 <button type="submit" class="btn-signup" id="signupBtn">
                     <span class="spinner" style="display: none;"></span>
-                    Create Account
+                    <span id="signupBtnText">Create Customer Account</span>
                 </button>
             </form>
 
@@ -331,6 +373,24 @@
     <script>
         // Use API_CONFIG from script.js instead of duplicate declaration
         const API_BASE_URL = API_CONFIG.BASE_URL;
+
+        function selectAccountType(type) {
+            document.getElementById('accountType').value = type;
+            
+            // Update button styles
+            document.querySelectorAll('.account-type-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            document.querySelector(`.account-type-btn[data-type="${type}"]`).classList.add('active');
+            
+            // Update button text
+            const btnText = document.getElementById('signupBtnText');
+            if (type === 'admin') {
+                btnText.textContent = 'Create Staff Account';
+            } else {
+                btnText.textContent = 'Create Customer Account';
+            }
+        }
 
         function checkPassword() {
             const password = document.getElementById('password').value;
@@ -352,6 +412,7 @@
             const lastName = document.getElementById('lastName').value.trim();
             const password = document.getElementById('password').value;
             const passwordConfirm = document.getElementById('passwordConfirm').value;
+            const accountType = document.getElementById('accountType').value;
 
             // Clear previous messages
             document.getElementById('errorMessage').classList.remove('show');
@@ -412,11 +473,38 @@
                 localStorage.setItem('refresh_token', data.refresh);
                 localStorage.setItem('user', JSON.stringify(data.user));
 
-                showSuccess('Account created successfully! Redirecting to dashboard...');
-                
-                setTimeout(() => {
-                    window.location.href = 'admin-dashboard.html';
-                }, 1500);
+                // For admin accounts, set is_staff flag
+                if (accountType === 'admin') {
+                    // Update user to staff
+                    await fetch(`${API_BASE_URL}/auth/profile/`, {
+                        method: 'PUT',
+                        headers: {
+                            'Authorization': `Bearer ${data.access}`,
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            first_name: firstName,
+                            last_name: lastName,
+                            email: email,
+                            is_staff: true
+                        })
+                    });
+
+                    const updatedUser = { ...data.user, is_staff: true, user_type: 'admin' };
+                    localStorage.setItem('user', JSON.stringify(updatedUser));
+                    localStorage.setItem('user_type', 'admin');
+                    
+                    showSuccess('Admin account created successfully! Redirecting to admin panel...');
+                    setTimeout(() => {
+                        window.location.href = 'admin-dashboard.html';
+                    }, 1500);
+                } else {
+                    localStorage.setItem('user_type', 'customer');
+                    showSuccess('Account created successfully! Redirecting to your dashboard...');
+                    setTimeout(() => {
+                        window.location.href = 'customer-dashboard.html';
+                    }, 1500);
+                }
 
             } catch (error) {
                 console.error('Error:', error);
@@ -442,8 +530,14 @@
         // Check if already logged in
         window.addEventListener('load', () => {
             const token = localStorage.getItem('access_token');
+            const user = JSON.parse(localStorage.getItem('user') || '{}');
+            
             if (token) {
-                window.location.href = 'admin-dashboard.html';
+                if (user.user_type === 'admin' || user.is_staff) {
+                    window.location.href = 'admin-dashboard.html';
+                } else {
+                    window.location.href = 'customer-dashboard.html';
+                }
             }
         });
     </script>

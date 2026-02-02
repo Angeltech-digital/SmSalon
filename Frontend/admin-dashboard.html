@@ -845,11 +845,20 @@
         // Use API_CONFIG from script.js instead of duplicate declaration
         const API_BASE_URL = API_CONFIG.BASE_URL;
         let accessToken = localStorage.getItem('access_token');
+        let currentUser = null;
 
         // Check authentication
         window.addEventListener('load', () => {
             if (!accessToken) {
                 window.location.href = 'login.html';
+                return;
+            }
+
+            currentUser = JSON.parse(localStorage.getItem('user') || '{}');
+            
+            // Check if user is customer - redirect to customer dashboard
+            if (currentUser.user_type === 'customer' && !currentUser.is_staff) {
+                window.location.href = 'customer-dashboard.html';
                 return;
             }
 
@@ -1468,6 +1477,7 @@
             localStorage.removeItem('access_token');
             localStorage.removeItem('refresh_token');
             localStorage.removeItem('user');
+            localStorage.removeItem('user_type');
             window.location.href = 'login.html';
         });
     </script>
