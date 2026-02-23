@@ -52,8 +52,8 @@ document.addEventListener("DOMContentLoaded", () => {
     checkBackendConnection();
     loadServices();
     
-    // setupBookingForm();
-    // setupContactForm();
+    setupBookingForm();
+    setupContactForm();
     setMinDate();
     formatPhoneNumber("phone");
     validateTimeSlot();
@@ -132,6 +132,62 @@ function getOfflineServices() {
     ];
 }
 
+// ==================== SETUP BOOKING FORM ====================
+function setupBookingForm() {
+    const form = document.getElementById("bookingForm");
+    if (!form) return;
+
+    form.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        
+        // Collect form data
+        const fullname = document.getElementById("fullname").value.trim();
+        const phone = document.getElementById("phone").value.trim();
+        const email = document.getElementById("email").value.trim();
+        const service = document.getElementById("service").value;
+        const date = document.getElementById("date").value;
+        const time = document.getElementById("time").value;
+        const notes = document.getElementById("notes").value.trim();
+
+        // Validate required fields
+        if (!fullname) {
+            alert("❌ Full name is required");
+            return;
+        }
+        if (!phone) {
+            alert("❌ Phone number is required");
+            return;
+        }
+        if (!service) {
+            alert("❌ Please select a service");
+            return;
+        }
+        if (!date) {
+            alert("❌ Please select a date");
+            return;
+        }
+        if (!time) {
+            alert("❌ Please select a time");
+            return;
+        }
+
+        // Prepare booking data
+        const bookingData = {
+            fullname,
+            phone,
+            email: email || null,
+            service: parseInt(service),
+            stylist: null,
+            date,
+            time,
+            notes: notes || "",
+            send_email: true
+        };
+
+        await submitBooking(bookingData);
+    });
+}
+
 // ==================== BOOKING SUBMIT ====================
 async function submitBooking(data) {
     if (window.IS_OFFLINE) {
@@ -146,12 +202,50 @@ async function submitBooking(data) {
             body: JSON.stringify(data)
         });
 
-        if (!res.ok) throw new Error();
+        if (!res.ok) {
+            const errorData = await res.json();
+            const errorMsg = errorData.phone?.[0] || errorData.service?.[0] || errorData.date?.[0] || errorData.time?.[0] || "Booking failed. Please try again.";
+            alert("❌ " + errorMsg);
+            return;
+        }
+
+        // Show success message
+        document.getElementById("bookingForm").style.display = "none";
+        document.getElementById("successMessage").style.display = "block";
+        
+        // Reset form
         document.getElementById("bookingForm").reset();
-        alert("✅ Booking successful!");
-    } catch {
-        alert("❌ Booking failed. Try again.");
+        
+        // Log success
+        console.log("✅ Booking submitted successfully");
+    } catch (error) {
+        console.error("Booking error:", error);
+        alert("❌ Error submitting booking. Please try again.");
     }
+}
+
+// ==================== SETUP CONTACT FORM ====================
+function setupContactForm() {
+    const form = document.getElementById("contactForm");
+    if (!form) return;
+
+    form.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        
+        const name = document.getElementById("name").value.trim();
+        const email = document.getElementById("contact-email").value.trim();
+        const subject = document.getElementById("subject").value.trim();
+        const message = document.getElementById("message").value.trim();
+
+        // Validate
+        if (!name || !email || !subject || !message) {
+            alert("❌ All fields are required");
+            return;
+        }
+
+        const contactData = { name, email, subject, message };
+        await submitContact(contactData);
+    });
 }
 
 // ==================== CONTACT SUBMIT ====================
@@ -163,10 +257,18 @@ async function submitContact(data) {
             body: JSON.stringify(data)
         });
 
-        if (!res.ok) throw new Error();
-        alert("✅ Message sent!");
-    } catch {
-        alert("❌ Failed to send message.");
+        if (!res.ok) {
+            const errorData = await res.json();
+            const errorMsg = Object.values(errorData)[0]?.[0] || "Failed to send message.";
+            alert("❌ " + errorMsg);
+            return;
+        }
+        
+        alert("✅ Message sent! We'll get back to you soon.");
+        document.getElementById("contactForm").reset();
+    } catch (error) {
+        console.error("Contact form error:", error);
+        alert("❌ Error sending message. Please try again.");
     }
 }
 // ==================== UI HELPERS ====================

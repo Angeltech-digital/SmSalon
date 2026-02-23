@@ -160,7 +160,7 @@ class ContactMessageSerializer(serializers.ModelSerializer):
                 [settings.email],
                 fail_silently=True,
             )
-        except Exception as e:
+        except Exception as e:1 community question
             print(f"Error sending contact notification: {e}")
 
 
