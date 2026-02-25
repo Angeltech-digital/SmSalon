@@ -1,0 +1,19 @@
+<svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+  <!-- Circular background -->
+  <circle cx="100" cy="100" r="95" fill="none" stroke="#c89b3c" stroke-width="3"/>
+  
+  <!-- Inner circle accent -->
+  <circle cx="100" cy="100" r="85" fill="#111" opacity="0.05"/>
+  
+  <!-- Letter S -->
+  <text x="65" y="120" font-size="80" font-weight="bold" font-family="Arial, sans-serif" fill="#c89b3c">S</text>
+  
+  <!-- Letter M -->
+  <text x="115" y="120" font-size="80" font-weight="bold" font-family="Arial, sans-serif" fill="#c89b3c">M</text>
+  
+  <!-- Decorative line -->
+  <line x1="50" y1="135" x2="150" y2="135" stroke="#c89b3c" stroke-width="2" opacity="0.6"/>
+  
+  <!-- Text below -->
+  <text x="100" y="160" font-size="12" font-weight="600" font-family="Arial, sans-serif" fill="#111" text-anchor="middle">SALON & SPA</text>
+</svg>

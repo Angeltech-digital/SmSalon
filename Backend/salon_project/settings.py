@@ -70,18 +70,18 @@ TEMPLATES = [
 WSGI_APPLICATION = 'salon_project.wsgi.application'
 
 # ---------------------------
-# Database (PostgreSQL on production, SQLite for local dev)
+# Database (PostgreSQL on DigitalOcean)
 # ---------------------------
-db_from_env = dj_database_url.config(conn_max_age=500, ssl_require=True)
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': os.environ.get("DB_NAME"),
+        'USER': os.environ.get("DB_USER"),
+        'PASSWORD': os.environ.get("DB_PASSWORD"),
+        'HOST': os.environ.get("DB_HOST"),
+        'PORT': os.environ.get("DB_PORT"),
     }
 }
-# Override with PostgreSQL if DATABASE_URL is set (DigitalOcean)
-if os.environ.get('DATABASE_URL'):
-    DATABASES['default'] = dj_database_url.config(conn_max_age=500, ssl_require=True)
 
 # ---------------------------
 # Password validators
